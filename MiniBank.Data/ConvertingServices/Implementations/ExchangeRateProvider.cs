@@ -6,9 +6,9 @@ namespace MiniBank.Data.ConvertingServices.Implementations
     public class ExchangeRateProvider : IExchangeRateProvider
     {
         private readonly double _minValue;
-        
+
         private readonly double _maxValue;
-        
+
         private readonly Random _randomizer;
 
         public ExchangeRateProvider(double minValue, double maxValue)
@@ -17,6 +17,7 @@ namespace MiniBank.Data.ConvertingServices.Implementations
             _maxValue = maxValue;
             _randomizer = new Random();
         }
+        
         public double GetCourse(string currencyName)
         {
             return currencyName switch

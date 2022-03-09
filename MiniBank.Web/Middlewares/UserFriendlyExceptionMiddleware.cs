@@ -13,16 +13,16 @@ namespace MiniBank.Web.Middlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
             try
             {
-                await _next(context);
+                await _next(httpContext);
             }
             catch (UserFriendlyException userFriendlyException)
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsJsonAsync(new { Error = $"{userFriendlyException.Message}" });
+                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{userFriendlyException.Message}" });
             }
         }
     }
