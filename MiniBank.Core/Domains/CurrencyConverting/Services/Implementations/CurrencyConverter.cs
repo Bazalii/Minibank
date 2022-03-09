@@ -13,8 +13,9 @@ namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
 
         public double ConvertCurrency(int amount, string currencyName)
         {
-            var result = amount * _exchangeRateProvider.GetCourse(currencyName);
-            return result >= 0 ? result : throw new UserFriendlyException("Incorrect amount of rubles or currency name!");
+            if (amount < 0)
+                throw new UserFriendlyException("The amount of rubles cannot be negative!");
+            return amount * _exchangeRateProvider.GetCourse(currencyName);
         }
     }
 }

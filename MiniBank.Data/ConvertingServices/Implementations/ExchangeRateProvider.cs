@@ -1,5 +1,6 @@
 ﻿using System;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
+using MiniBank.Core.Exceptions;
 
 namespace MiniBank.Data.ConvertingServices.Implementations
 {
@@ -24,7 +25,7 @@ namespace MiniBank.Data.ConvertingServices.Implementations
             {
                 "Dollar" => _randomizer.NextDouble() * (_maxValue - _minValue) + _minValue,
                 "Euro" => _randomizer.NextDouble() * (_maxValue - _minValue) + _minValue,
-                _ => -1
+                _ => throw new UserFriendlyException("Incorrect type of currency!")
             };
         }
     }
