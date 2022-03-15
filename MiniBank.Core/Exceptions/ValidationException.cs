@@ -2,9 +2,9 @@
 
 namespace MiniBank.Core.Exceptions
 {
-    public class UserFriendlyException : Exception
+    public class ValidationException : Exception
     {
-        public UserFriendlyException(string message)
+        public ValidationException(string message)
             : base(message)
         {
         }

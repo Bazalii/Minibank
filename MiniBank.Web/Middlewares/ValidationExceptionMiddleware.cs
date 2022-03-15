@@ -4,11 +4,11 @@ using MiniBank.Core.Exceptions;
 
 namespace MiniBank.Web.Middlewares
 {
-    public class UserFriendlyExceptionMiddleware
+    public class ValidationExceptionMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public UserFriendlyExceptionMiddleware(RequestDelegate next)
+        public ValidationExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -19,7 +19,7 @@ namespace MiniBank.Web.Middlewares
             {
                 await _next(httpContext);
             }
-            catch (UserFriendlyException userFriendlyException)
+            catch (ValidationException userFriendlyException)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await httpContext.Response.WriteAsJsonAsync(new { Error = $"{userFriendlyException.Message}" });

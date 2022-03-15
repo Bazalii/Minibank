@@ -41,7 +41,7 @@ namespace MiniBank.Web
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MiniBank.Web v1"));
             }
 
-            app.UseMiddleware<UserFriendlyExceptionMiddleware>();
+            app.UseMiddleware<ValidationExceptionMiddleware>();
             
             app.UseHttpsRedirection();
 

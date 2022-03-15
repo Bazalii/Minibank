@@ -25,7 +25,7 @@ namespace MiniBank.Data.ConvertingServices.Implementations
             {
                 "Dollar" => _randomizer.NextDouble() * (_maxValue - _minValue) + _minValue,
                 "Euro" => _randomizer.NextDouble() * (_maxValue - _minValue) + _minValue,
-                _ => throw new UserFriendlyException("Incorrect type of currency!")
+                _ => throw new ValidationException("Incorrect type of currency!")
             };
         }
     }
