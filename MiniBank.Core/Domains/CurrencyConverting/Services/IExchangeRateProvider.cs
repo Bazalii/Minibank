@@ -2,6 +2,6 @@
 {
     public interface IExchangeRateProvider
     {
-        double GetCourse(string currencyName);
+        double GetCourse(string currencyCode);
     }
 }
