@@ -29,7 +29,7 @@ namespace MiniBank.Data.ConvertingServices.HttpClients.Implementations
                 throw new ValidationException($"{currencyCode} is not correct currency code!");
             }
 
-            return Math.Round(response.Currencies[currencyCode].Value, 3);
+            return Math.Round(response.Currencies[currencyCode].Value, 2);
         }
     }
 }

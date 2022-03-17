@@ -1,4 +1,5 @@
-﻿using MiniBank.Core.Exceptions;
+﻿using System;
+using MiniBank.Core.Exceptions;
 
 namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
 {
@@ -18,7 +19,7 @@ namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
                 throw new ValidationException("The amount of money cannot be negative!");
             }
 
-            return amount * _exchangeRateProvider.GetCourse(fromCurrency) / _exchangeRateProvider.GetCourse(toCurrency);
+            return Math.Round(amount * _exchangeRateProvider.GetCourse(fromCurrency) / _exchangeRateProvider.GetCourse(toCurrency), 2);
         }
     }
 }
