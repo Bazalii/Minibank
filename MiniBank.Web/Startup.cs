@@ -1,12 +1,15 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MiniBank.Core;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
 using MiniBank.Core.Domains.CurrencyConverting.Services.Implementations;
-using MiniBank.Data.ConvertingServices.Implementations;
+using MiniBank.Data;
+using MiniBank.Data.ConvertingServices.HttpClients.Implementations;
 using MiniBank.Web.Middlewares;
 
 namespace MiniBank.Web
@@ -19,7 +22,7 @@ namespace MiniBank.Web
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -27,14 +30,13 @@ namespace MiniBank.Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "MiniBank.Web", Version = "v1"});
             });
-            services.AddScoped<ICurrencyConverter, CurrencyConverter>();
-            services.AddScoped<IExchangeRateProvider>(_ => new ExchangeRateProvider(0.005, 0.015));
+            services.AddCore().AddData(Configuration);
         }
-        
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
-            
+
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
@@ -42,7 +44,7 @@ namespace MiniBank.Web
             }
 
             app.UseMiddleware<ValidationExceptionMiddleware>();
-            
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
