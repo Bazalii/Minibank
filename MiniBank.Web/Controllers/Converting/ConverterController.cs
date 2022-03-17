@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
 
-namespace MiniBank.Web.Controllers
+namespace MiniBank.Web.Controllers.Converting
 {
     [ApiController]
     [Route("[controller]")]
@@ -16,9 +16,9 @@ namespace MiniBank.Web.Controllers
 
         [HttpGet]
         [Route("/convert")]
-        public double ConvertRublesToCurrency(int amount, string currencyName)
+        public double ConvertOneCurrencyToAnother(int amount, string fromCurrency, string toCurrency)
         {
-            return _currencyConverter.ConvertCurrency(amount, currencyName);
+            return _currencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
         }
     }
 }

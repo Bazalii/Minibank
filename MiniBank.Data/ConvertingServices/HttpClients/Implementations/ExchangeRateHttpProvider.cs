@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Json;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
 using MiniBank.Core.Exceptions;
@@ -9,14 +10,17 @@ namespace MiniBank.Data.ConvertingServices.HttpClients.Implementations
     public class ExchangeRateHttpProvider : IExchangeRateProvider
     {
         private readonly HttpClient _httpClient;
-        
+
         public ExchangeRateHttpProvider(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
-        
+
         public double GetCourse(string currencyCode)
         {
+            if (currencyCode == "RUB")
+                return 1;
+
             var response = _httpClient.GetFromJsonAsync<ExchangeRateResponse>("daily_json.js")
                 .GetAwaiter().GetResult();
 
@@ -24,8 +28,8 @@ namespace MiniBank.Data.ConvertingServices.HttpClients.Implementations
             {
                 throw new ValidationException($"{currencyCode} is not correct currency code!");
             }
-            
-            return response.Currencies[currencyCode].Value;
+
+            return Math.Round(response.Currencies[currencyCode].Value, 3);
         }
     }
 }

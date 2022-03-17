@@ -11,11 +11,14 @@ namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
             _exchangeRateProvider = exchangeRateProvider;
         }
 
-        public double ConvertCurrency(int amount, string currencyName)
+        public double ConvertCurrency(double amount, string fromCurrency, string toCurrency)
         {
             if (amount < 0)
-                throw new ValidationException("The amount of rubles cannot be negative!");
-            return amount * _exchangeRateProvider.GetCourse(currencyName);
+            {
+                throw new ValidationException("The amount of money cannot be negative!");
+            }
+
+            return amount * _exchangeRateProvider.GetCourse(fromCurrency) / _exchangeRateProvider.GetCourse(toCurrency);
         }
     }
 }

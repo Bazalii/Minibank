@@ -2,6 +2,6 @@
 {
     public interface ICurrencyConverter
     {
-        double ConvertCurrency(int amount, string currencyName);
+        double ConvertCurrency(double amount, string fromCurrency, string toCurrency);
     }
 }
