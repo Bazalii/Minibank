@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
 using MiniBank.Core.Exceptions;
@@ -27,6 +28,11 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
             return _userRepository.GetUserById(id);
         }
 
+        public IEnumerable<User> GetAll()
+        {
+            return _userRepository.GetAll();
+        }
+
         public void UpdateUser(User user)
         {
             _userRepository.Update(user);
@@ -35,7 +41,10 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
         public void DeleteUserById(Guid id)
         {
             if (_bankAccountRepository.CheckIfUserHasConnectedAccounts(id))
+            {
                 throw new ValidationException($"User with id: {id} has connected accounts!");
+            }
+            
             _userRepository.DeleteUserById(id);
         }
     }

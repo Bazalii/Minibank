@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MiniBank.Core.Domains.Users.Repositories
 {
@@ -7,6 +8,8 @@ namespace MiniBank.Core.Domains.Users.Repositories
         void Add(User user);
 
         public User GetUserById(Guid id);
+
+        public IEnumerable<User> GetAll();
 
         public void Update(User user);
 

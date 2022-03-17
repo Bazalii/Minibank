@@ -9,7 +9,8 @@ namespace MiniBank.Data.Users.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly List<UserDbModel> _users = new ();
+        private readonly List<UserDbModel> _users = new();
+
         public void Add(User user)
         {
             _users.Add(new UserDbModel
@@ -34,6 +35,16 @@ namespace MiniBank.Data.Users.Repositories
                 Login = wantedUser.Login,
                 Email = wantedUser.Email
             };
+        }
+
+        public IEnumerable<User> GetAll()
+        {
+            return _users.Select(user => new User
+            {
+                Id = user.Id,
+                Login = user.Login,
+                Email = user.Email
+            });
         }
 
         public void Update(User user)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MiniBank.Core.Domains.Users;
 using MiniBank.Core.Domains.Users.Services;
@@ -7,7 +9,7 @@ using MiniBank.Web.Controllers.Users.Dto;
 namespace MiniBank.Web.Controllers.Users
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/user")]
     public class UserController
     {
         private readonly IUserService _userService;
@@ -28,7 +30,7 @@ namespace MiniBank.Web.Controllers.Users
             });
         }
 
-        [HttpGet]
+        [HttpGet("{id:guid}")]
         public UserResponse Get(Guid id)
         {
             var wantedUser = _userService.GetUserById(id);
@@ -38,6 +40,17 @@ namespace MiniBank.Web.Controllers.Users
                 Email = wantedUser.Email,
                 Login = wantedUser.Login
             };
+        }
+
+        [HttpGet]
+        public IEnumerable<UserResponse> GetAll()
+        {
+            return _userService.GetAll().Select(user => new UserResponse
+            {
+                Id = user.Id,
+                Login = user.Login,
+                Email = user.Email
+            });
         }
 
         [HttpPut]
