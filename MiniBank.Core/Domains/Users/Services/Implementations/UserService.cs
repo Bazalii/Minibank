@@ -44,7 +44,7 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
             {
                 throw new ValidationException($"User with id: {id} has connected accounts!");
             }
-            
+
             _userRepository.DeleteUserById(id);
         }
     }

@@ -2,7 +2,7 @@
 
 namespace MiniBank.Web.Controllers.BankAccounts.Dto
 {
-    public class BankAccountRequestOnCreation
+    public class BankAccountCreationRequest
     {
         public Guid UserId { get; set; }
 

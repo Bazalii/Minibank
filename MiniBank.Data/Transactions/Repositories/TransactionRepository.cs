@@ -24,45 +24,45 @@ namespace MiniBank.Data.Transactions.Repositories
 
         public Transaction GetTransactionById(Guid id)
         {
-            var wantedTransaction = _transactions.FirstOrDefault(transaction => transaction.Id == id);
-            if (wantedTransaction == null)
+            var dbModel = _transactions.FirstOrDefault(transaction => transaction.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
             }
 
             return new Transaction
             {
-                Id = wantedTransaction.Id,
-                AmountOfMoney = wantedTransaction.AmountOfMoney,
-                WithdrawalAccount = wantedTransaction.WithdrawalAccount,
-                ReplenishmentAccount = wantedTransaction.ReplenishmentAccount
+                Id = dbModel.Id,
+                AmountOfMoney = dbModel.AmountOfMoney,
+                WithdrawalAccount = dbModel.WithdrawalAccount,
+                ReplenishmentAccount = dbModel.ReplenishmentAccount
             };
         }
 
         public void Update(Transaction transaction)
         {
-            var wantedTransaction =
+            var dbModel =
                 _transactions.FirstOrDefault(currentTransaction => currentTransaction.Id == transaction.Id);
-            if (wantedTransaction == null)
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {transaction.Id} is not found!");
             }
 
-            wantedTransaction.Id = transaction.Id;
-            wantedTransaction.AmountOfMoney = transaction.AmountOfMoney;
-            wantedTransaction.WithdrawalAccount = transaction.WithdrawalAccount;
-            wantedTransaction.ReplenishmentAccount = transaction.ReplenishmentAccount;
+            dbModel.Id = transaction.Id;
+            dbModel.AmountOfMoney = transaction.AmountOfMoney;
+            dbModel.WithdrawalAccount = transaction.WithdrawalAccount;
+            dbModel.ReplenishmentAccount = transaction.ReplenishmentAccount;
         }
 
         public void DeleteTransactionById(Guid id)
         {
-            var wantedTransaction = _transactions.FirstOrDefault(transaction => transaction.Id == id);
-            if (wantedTransaction == null)
+            var dbModel = _transactions.FirstOrDefault(transaction => transaction.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
             }
 
-            _transactions.Remove(wantedTransaction);
+            _transactions.Remove(dbModel);
         }
     }
 }

@@ -28,21 +28,21 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public BankAccount GetAccountById(Guid id)
         {
-            var wantedAccount = _accounts.FirstOrDefault(account => account.Id == id);
-            if (wantedAccount == null)
+            var dbModel = _accounts.FirstOrDefault(account => account.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
             }
 
             return new BankAccount
             {
-                Id = wantedAccount.Id,
-                UserId = wantedAccount.UserId,
-                AmountOfMoney = wantedAccount.AmountOfMoney,
-                CurrencyCode = wantedAccount.CurrencyCode,
-                Open = wantedAccount.Open,
-                TimeOfOpening = wantedAccount.TimeOfOpening,
-                TimeOfClosing = wantedAccount.TimeOfClosing
+                Id = dbModel.Id,
+                UserId = dbModel.UserId,
+                AmountOfMoney = dbModel.AmountOfMoney,
+                CurrencyCode = dbModel.CurrencyCode,
+                Open = dbModel.Open,
+                TimeOfOpening = dbModel.TimeOfOpening,
+                TimeOfClosing = dbModel.TimeOfClosing
             };
         }
 
@@ -62,47 +62,47 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public void Update(BankAccount bankAccount)
         {
-            var wantedAccount = _accounts.FirstOrDefault(account => account.Id == bankAccount.Id);
-            if (wantedAccount == null)
+            var dbModel = _accounts.FirstOrDefault(account => account.Id == bankAccount.Id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {bankAccount.Id} is not found!");
             }
 
-            wantedAccount.Id = bankAccount.Id;
-            wantedAccount.UserId = bankAccount.UserId;
-            wantedAccount.AmountOfMoney = bankAccount.AmountOfMoney;
-            wantedAccount.CurrencyCode = bankAccount.CurrencyCode;
-            wantedAccount.Open = bankAccount.Open;
-            wantedAccount.TimeOfOpening = bankAccount.TimeOfOpening;
-            wantedAccount.TimeOfClosing = bankAccount.TimeOfClosing;
+            dbModel.Id = bankAccount.Id;
+            dbModel.UserId = bankAccount.UserId;
+            dbModel.AmountOfMoney = bankAccount.AmountOfMoney;
+            dbModel.CurrencyCode = bankAccount.CurrencyCode;
+            dbModel.Open = bankAccount.Open;
+            dbModel.TimeOfOpening = bankAccount.TimeOfOpening;
+            dbModel.TimeOfClosing = bankAccount.TimeOfClosing;
         }
 
         public void UpdateMoneyOnAccount(Guid id, double amountOfMoney)
         {
-            var wantedAccount = _accounts.FirstOrDefault(account => account.Id == id);
-            if (wantedAccount == null)
+            var dbModel = _accounts.FirstOrDefault(account => account.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
             }
-            
-            wantedAccount.AmountOfMoney = amountOfMoney;
+
+            dbModel.AmountOfMoney = amountOfMoney;
         }
 
         public void DeleteAccountById(Guid id)
         {
-            var wantedAccount = _accounts.FirstOrDefault(currentAccount => currentAccount.Id == id);
-            if (wantedAccount == null)
+            var dbModel = _accounts.FirstOrDefault(currentAccount => currentAccount.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
             }
 
-            if (wantedAccount.Open)
+            if (dbModel.Open)
             {
                 throw new ValidationException(
                     $"Account to delete with id: {id} should be closed before deletion!");
             }
 
-            _accounts.Remove(wantedAccount);
+            _accounts.Remove(dbModel);
         }
 
         public bool CheckIfUserHasConnectedAccounts(Guid userId)

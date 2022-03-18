@@ -23,17 +23,17 @@ namespace MiniBank.Data.Users.Repositories
 
         public User GetUserById(Guid id)
         {
-            var wantedUser = _users.FirstOrDefault(currentUser => currentUser.Id == id);
-            if (wantedUser == null)
+            var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {id} is not found!");
             }
 
             return new User
             {
-                Id = wantedUser.Id,
-                Login = wantedUser.Login,
-                Email = wantedUser.Email
+                Id = dbModel.Id,
+                Login = dbModel.Login,
+                Email = dbModel.Email
             };
         }
 
@@ -49,25 +49,25 @@ namespace MiniBank.Data.Users.Repositories
 
         public void Update(User user)
         {
-            var wantedUser = _users.FirstOrDefault(currentUser => currentUser.Id == user.Id);
-            if (wantedUser == null)
+            var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == user.Id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {user.Id} is not found!");
             }
 
-            wantedUser.Login = user.Login;
-            wantedUser.Email = user.Email;
+            dbModel.Login = user.Login;
+            dbModel.Email = user.Email;
         }
 
         public void DeleteUserById(Guid id)
         {
-            var wantedUser = _users.FirstOrDefault(currentUser => currentUser.Id == id);
-            if (wantedUser == null)
+            var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == id);
+            if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {id} is not found!");
             }
 
-            _users.Remove(wantedUser);
+            _users.Remove(dbModel);
         }
 
         public bool CheckByIdIfUserExists(Guid id)

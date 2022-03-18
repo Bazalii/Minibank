@@ -20,14 +20,14 @@ namespace MiniBank.Web.Controllers.BankAccounts
         }
 
         [HttpPost]
-        public void Create(BankAccountRequestOnCreation request)
+        public void Create(BankAccountCreationRequest model)
         {
             _bankAccountService.AddAccount(new BankAccount
             {
                 Id = Guid.NewGuid(),
-                UserId = request.UserId,
-                AmountOfMoney = request.AmountOfMoney,
-                CurrencyCode = request.CurrencyCode,
+                UserId = model.UserId,
+                AmountOfMoney = model.AmountOfMoney,
+                CurrencyCode = model.CurrencyCode,
                 Open = true,
                 TimeOfOpening = DateTime.Now
             });
@@ -36,16 +36,16 @@ namespace MiniBank.Web.Controllers.BankAccounts
         [HttpGet("{id:guid}")]
         public BankAccountResponse Get(Guid id)
         {
-            var wantedAccount = _bankAccountService.GetAccountById(id);
+            var model = _bankAccountService.GetAccountById(id);
             return new BankAccountResponse
             {
-                Id = wantedAccount.Id,
-                UserId = wantedAccount.UserId,
-                AmountOfMoney = wantedAccount.AmountOfMoney,
-                CurrencyCode = wantedAccount.CurrencyCode,
-                Open = wantedAccount.Open,
-                TimeOfOpening = wantedAccount.TimeOfOpening,
-                TimeOfClosing = wantedAccount.TimeOfClosing
+                Id = model.Id,
+                UserId = model.UserId,
+                AmountOfMoney = model.AmountOfMoney,
+                CurrencyCode = model.CurrencyCode,
+                Open = model.Open,
+                TimeOfOpening = model.TimeOfOpening,
+                TimeOfClosing = model.TimeOfClosing
             };
         }
 
@@ -65,13 +65,13 @@ namespace MiniBank.Web.Controllers.BankAccounts
         }
 
         [HttpPut("{id:guid}")]
-        public void Update(Guid id, BankAccountRequestOnMoneyUpdate request)
+        public void Update(Guid id, BankAccountMoneyUpdateRequest model)
         {
-            _bankAccountService.UpdateMoneyOnAccount(id, request.AmountOfMoney);
+            _bankAccountService.UpdateMoneyOnAccount(id, model.AmountOfMoney);
         }
 
         [HttpPost]
-        [Route("/closeAccount")]
+        [Route("/close")]
         public void CloseAccount(Guid id)
         {
             _bankAccountService.CloseAccountById(id);

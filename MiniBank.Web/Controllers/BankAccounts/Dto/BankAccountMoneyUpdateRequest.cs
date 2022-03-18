@@ -1,6 +1,6 @@
 ﻿namespace MiniBank.Web.Controllers.BankAccounts.Dto
 {
-    public class BankAccountRequestOnMoneyUpdate
+    public class BankAccountMoneyUpdateRequest
     {
         public double AmountOfMoney { get; set; }
     }

@@ -62,8 +62,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public void CloseAccountById(Guid id)
         {
-            var wantedAccount = _bankAccountRepository.GetAccountById(id);
-            if (wantedAccount.AmountOfMoney != 0)
+            var model = _bankAccountRepository.GetAccountById(id);
+            if (model.AmountOfMoney != 0)
             {
                 throw new ValidationException(
                     $"Amount of money on account with id: {id} that you want to close should be 0!");
@@ -71,12 +71,12 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
             _bankAccountRepository.Update(new BankAccount
             {
-                Id = wantedAccount.Id,
-                UserId = wantedAccount.UserId,
-                AmountOfMoney = wantedAccount.AmountOfMoney,
-                CurrencyCode = wantedAccount.CurrencyCode,
+                Id = model.Id,
+                UserId = model.UserId,
+                AmountOfMoney = model.AmountOfMoney,
+                CurrencyCode = model.CurrencyCode,
                 Open = false,
-                TimeOfOpening = wantedAccount.TimeOfOpening,
+                TimeOfOpening = model.TimeOfOpening,
                 TimeOfClosing = DateTime.Now
             });
         }
@@ -85,12 +85,11 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
         {
             var withdrawalAccount = _bankAccountRepository.GetAccountById(withdrawalAccountId);
             var replenishmentAccount = _bankAccountRepository.GetAccountById(replenishmentAccountId);
-            if (withdrawalAccount.UserId != replenishmentAccount.UserId)
-            {
-                return Math.Round(amount * 0.02, 2);
-            }
+            if (withdrawalAccount.UserId == replenishmentAccount.UserId) return 0;
 
-            return 0;
+            var result = Math.Round(amount * 0.02, 2);
+
+            return result;
         }
 
         public void TransferMoney(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)
@@ -102,7 +101,9 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
             var withdrawalAccount = _bankAccountRepository.GetAccountById(withdrawalAccountId);
             var replenishmentAccount = _bankAccountRepository.GetAccountById(replenishmentAccountId);
+
             _bankAccountRepository.UpdateMoneyOnAccount(withdrawalAccountId, withdrawalAccount.AmountOfMoney - amount);
+
             var finalAmount = amount;
             if (withdrawalAccount.CurrencyCode != replenishmentAccount.CurrencyCode)
             {
@@ -111,7 +112,10 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             }
 
             finalAmount -= CalculateCommission(finalAmount, withdrawalAccountId, replenishmentAccountId);
-            _bankAccountRepository.UpdateMoneyOnAccount(replenishmentAccountId, replenishmentAccount.AmountOfMoney + finalAmount);
+
+            _bankAccountRepository.UpdateMoneyOnAccount(replenishmentAccountId,
+                replenishmentAccount.AmountOfMoney + finalAmount);
+
             _transactionRepository.Add(new Transaction
             {
                 Id = Guid.NewGuid(),
