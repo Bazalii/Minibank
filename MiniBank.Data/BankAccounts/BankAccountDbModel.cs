@@ -1,4 +1,5 @@
 ﻿using System;
+using MiniBank.Core.Enums;
 
 namespace MiniBank.Data.BankAccounts
 {
@@ -10,7 +11,7 @@ namespace MiniBank.Data.BankAccounts
 
         public double AmountOfMoney { get; set; }
 
-        public string CurrencyCode { get; set; }
+        public Currencies CurrencyCode { get; set; }
 
         public bool Open { get; set; }
 

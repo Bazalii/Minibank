@@ -5,6 +5,7 @@ using MiniBank.Core.Domains.CurrencyConverting.Services;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
+using MiniBank.Core.Enums;
 using MiniBank.Core.Exceptions;
 
 namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
@@ -30,8 +31,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public void AddAccount(BankAccount bankAccount)
         {
-            if (bankAccount.CurrencyCode != "RUB" && bankAccount.CurrencyCode != "USD" &&
-                bankAccount.CurrencyCode != "EUR")
+            if (bankAccount.CurrencyCode != Currencies.RUB && bankAccount.CurrencyCode != Currencies.USD &&
+                bankAccount.CurrencyCode != Currencies.EUR)
             {
                 throw new ValidationException($"Invalid currency code: {bankAccount.CurrencyCode}");
             }

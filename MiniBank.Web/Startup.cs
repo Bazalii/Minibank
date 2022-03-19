@@ -30,7 +30,7 @@ namespace MiniBank.Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "MiniBank.Web", Version = "v1"});
             });
-            services.AddCore().AddData(Configuration);
+            services.AddCore().AddData(Configuration).AddWeb();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

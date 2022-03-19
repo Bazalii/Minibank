@@ -61,18 +61,18 @@ namespace MiniBank.Data.Users.Repositories
 
         public void DeleteUserById(Guid id)
         {
-            var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == id);
-            if (dbModel == null)
+            _users.RemoveAt(CheckByIdIfUserExists(id));
+        }
+
+        public int CheckByIdIfUserExists(Guid id)
+        {
+            var index = _users.FindIndex(currentUser => currentUser.Id == id);
+            if (index == -1)
             {
                 throw new ObjectNotFoundException($"User with id: {id} is not found!");
             }
 
-            _users.Remove(dbModel);
-        }
-
-        public bool CheckByIdIfUserExists(Guid id)
-        {
-            return GetUserById(id) != null;
+            return index;
         }
     }
 }

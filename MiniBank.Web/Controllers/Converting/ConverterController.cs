@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
+using MiniBank.Core.Enums;
 
 namespace MiniBank.Web.Controllers.Converting
 {
@@ -16,7 +17,7 @@ namespace MiniBank.Web.Controllers.Converting
 
         [HttpGet]
         [Route("/convert")]
-        public double ConvertOneCurrencyToAnother(int amount, string fromCurrency, string toCurrency)
+        public double ConvertOneCurrencyToAnother(int amount, Currencies fromCurrency, Currencies toCurrency)
         {
             return _currencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
         }

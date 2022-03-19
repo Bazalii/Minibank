@@ -1,4 +1,5 @@
 ﻿using System;
+using MiniBank.Core.Enums;
 using MiniBank.Core.Exceptions;
 
 namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
@@ -12,7 +13,7 @@ namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
             _exchangeRateProvider = exchangeRateProvider;
         }
 
-        public double ConvertCurrency(double amount, string fromCurrency, string toCurrency)
+        public double ConvertCurrency(double amount, Currencies fromCurrency, Currencies toCurrency)
         {
             if (amount < 0)
             {
@@ -21,8 +22,8 @@ namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
 
             var result =
                 Math.Round(
-                    amount * _exchangeRateProvider.GetCourse(fromCurrency) /
-                    _exchangeRateProvider.GetCourse(toCurrency), 2);
+                    amount * _exchangeRateProvider.GetCourse(fromCurrency.ToString()) /
+                    _exchangeRateProvider.GetCourse(toCurrency.ToString()), 2);
 
             return result;
         }
