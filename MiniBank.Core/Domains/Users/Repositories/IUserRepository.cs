@@ -15,6 +15,6 @@ namespace MiniBank.Core.Domains.Users.Repositories
 
         public void DeleteUserById(Guid id);
 
-        public int CheckByIdIfUserExists(Guid id);
+        public int Exists(Guid id);
     }
 }

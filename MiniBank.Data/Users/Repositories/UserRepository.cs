@@ -61,10 +61,10 @@ namespace MiniBank.Data.Users.Repositories
 
         public void DeleteUserById(Guid id)
         {
-            _users.RemoveAt(CheckByIdIfUserExists(id));
+            _users.RemoveAt(Exists(id));
         }
 
-        public int CheckByIdIfUserExists(Guid id)
+        public int Exists(Guid id)
         {
             var index = _users.FindIndex(currentUser => currentUser.Id == id);
             if (index == -1)

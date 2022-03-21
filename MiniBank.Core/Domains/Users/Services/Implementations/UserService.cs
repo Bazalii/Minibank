@@ -40,7 +40,7 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
 
         public void DeleteUserById(Guid id)
         {
-            if (_bankAccountRepository.CheckIfUserHasConnectedAccounts(id))
+            if (_bankAccountRepository.ExistsForUser(id))
             {
                 throw new ValidationException($"User with id: {id} has connected accounts!");
             }

@@ -13,10 +13,10 @@ namespace MiniBank.Core.Domains.BankAccounts.Repositories
 
         void Update(BankAccount bankAccount);
 
-        void UpdateMoneyOnAccount(Guid id, double amountOfMoney);
+        void UpdateAccountMoney(Guid id, double amountOfMoney);
 
         void DeleteAccountById(Guid id);
 
-        bool CheckIfUserHasConnectedAccounts(Guid accountId);
+        bool ExistsForUser(Guid accountId);
     }
 }

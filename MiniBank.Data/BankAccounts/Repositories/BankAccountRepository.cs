@@ -20,9 +20,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 UserId = bankAccount.UserId,
                 AmountOfMoney = bankAccount.AmountOfMoney,
                 CurrencyCode = bankAccount.CurrencyCode,
-                Open = bankAccount.Open,
-                TimeOfOpening = bankAccount.TimeOfOpening,
-                TimeOfClosing = bankAccount.TimeOfClosing
+                IsOpened = bankAccount.IsOpened,
+                OpenDate = bankAccount.OpenDate,
+                CloseDate = bankAccount.CloseDate
             });
         }
 
@@ -40,9 +40,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 UserId = dbModel.UserId,
                 AmountOfMoney = dbModel.AmountOfMoney,
                 CurrencyCode = dbModel.CurrencyCode,
-                Open = dbModel.Open,
-                TimeOfOpening = dbModel.TimeOfOpening,
-                TimeOfClosing = dbModel.TimeOfClosing
+                IsOpened = dbModel.IsOpened,
+                OpenDate = dbModel.OpenDate,
+                CloseDate = dbModel.CloseDate
             };
         }
 
@@ -54,9 +54,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 UserId = account.UserId,
                 AmountOfMoney = account.AmountOfMoney,
                 CurrencyCode = account.CurrencyCode,
-                Open = account.Open,
-                TimeOfOpening = account.TimeOfOpening,
-                TimeOfClosing = account.TimeOfClosing
+                IsOpened = account.IsOpened,
+                OpenDate = account.OpenDate,
+                CloseDate = account.CloseDate
             });
         }
 
@@ -72,12 +72,12 @@ namespace MiniBank.Data.BankAccounts.Repositories
             dbModel.UserId = bankAccount.UserId;
             dbModel.AmountOfMoney = bankAccount.AmountOfMoney;
             dbModel.CurrencyCode = bankAccount.CurrencyCode;
-            dbModel.Open = bankAccount.Open;
-            dbModel.TimeOfOpening = bankAccount.TimeOfOpening;
-            dbModel.TimeOfClosing = bankAccount.TimeOfClosing;
+            dbModel.IsOpened = bankAccount.IsOpened;
+            dbModel.OpenDate = bankAccount.OpenDate;
+            dbModel.CloseDate = bankAccount.CloseDate;
         }
 
-        public void UpdateMoneyOnAccount(Guid id, double amountOfMoney)
+        public void UpdateAccountMoney(Guid id, double amountOfMoney)
         {
             var dbModel = _accounts.FirstOrDefault(account => account.Id == id);
             if (dbModel == null)
@@ -96,7 +96,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
             }
 
-            if (dbModel.Open)
+            if (dbModel.IsOpened)
             {
                 throw new ValidationException(
                     $"Account to delete with id: {id} should be closed before deletion!");
@@ -105,7 +105,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
             _accounts.Remove(dbModel);
         }
 
-        public bool CheckIfUserHasConnectedAccounts(Guid userId)
+        public bool ExistsForUser(Guid userId)
         {
             return _accounts.FirstOrDefault(account => account.UserId == userId) != null;
         }

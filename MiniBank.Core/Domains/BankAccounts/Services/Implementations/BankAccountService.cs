@@ -31,13 +31,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public void AddAccount(BankAccount bankAccount)
         {
-            if (bankAccount.CurrencyCode != Currencies.RUB && bankAccount.CurrencyCode != Currencies.USD &&
-                bankAccount.CurrencyCode != Currencies.EUR)
-            {
-                throw new ValidationException($"Invalid currency code: {bankAccount.CurrencyCode}");
-            }
-
-            _userRepository.CheckByIdIfUserExists(bankAccount.UserId);
+            _userRepository.Exists(bankAccount.UserId);
             _bankAccountRepository.Add(bankAccount);
         }
 
@@ -58,7 +52,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public void UpdateMoneyOnAccount(Guid id, double amountOfMoney)
         {
-            _bankAccountRepository.UpdateMoneyOnAccount(id, amountOfMoney);
+            _bankAccountRepository.UpdateAccountMoney(id, amountOfMoney);
         }
 
         public void CloseAccountById(Guid id)
@@ -76,9 +70,9 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 UserId = model.UserId,
                 AmountOfMoney = model.AmountOfMoney,
                 CurrencyCode = model.CurrencyCode,
-                Open = false,
-                TimeOfOpening = model.TimeOfOpening,
-                TimeOfClosing = DateTime.Now
+                IsOpened = false,
+                OpenDate = model.OpenDate,
+                CloseDate = DateTime.Now
             });
         }
 
@@ -103,7 +97,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             var withdrawalAccount = _bankAccountRepository.GetAccountById(withdrawalAccountId);
             var replenishmentAccount = _bankAccountRepository.GetAccountById(replenishmentAccountId);
 
-            _bankAccountRepository.UpdateMoneyOnAccount(withdrawalAccountId, withdrawalAccount.AmountOfMoney - amount);
+            _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId, withdrawalAccount.AmountOfMoney - amount);
 
             var finalAmount = amount;
             if (withdrawalAccount.CurrencyCode != replenishmentAccount.CurrencyCode)
@@ -114,7 +108,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
             finalAmount -= CalculateCommission(finalAmount, withdrawalAccountId, replenishmentAccountId);
 
-            _bankAccountRepository.UpdateMoneyOnAccount(replenishmentAccountId,
+            _bankAccountRepository.UpdateAccountMoney(replenishmentAccountId,
                 replenishmentAccount.AmountOfMoney + finalAmount);
 
             _transactionRepository.Add(new Transaction

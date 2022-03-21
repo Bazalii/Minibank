@@ -13,10 +13,10 @@ namespace MiniBank.Data.BankAccounts
 
         public Currencies CurrencyCode { get; set; }
 
-        public bool Open { get; set; }
+        public bool IsOpened { get; set; }
 
-        public DateTime TimeOfOpening { get; set; }
+        public DateTime OpenDate { get; set; }
 
-        public DateTime TimeOfClosing { get; set; }
+        public DateTime? CloseDate { get; set; }
     }
 }

@@ -28,8 +28,8 @@ namespace MiniBank.Web.Controllers.BankAccounts
                 UserId = model.UserId,
                 AmountOfMoney = model.AmountOfMoney,
                 CurrencyCode = model.CurrencyCode,
-                Open = true,
-                TimeOfOpening = DateTime.Now
+                IsOpened = true,
+                OpenDate = DateTime.Now
             });
         }
 
@@ -43,9 +43,9 @@ namespace MiniBank.Web.Controllers.BankAccounts
                 UserId = model.UserId,
                 AmountOfMoney = model.AmountOfMoney,
                 CurrencyCode = model.CurrencyCode,
-                Open = model.Open,
-                TimeOfOpening = model.TimeOfOpening,
-                TimeOfClosing = model.TimeOfClosing
+                IsOpened = model.IsOpened,
+                OpenDate = model.OpenDate,
+                CloseDate = model.CloseDate
             };
         }
 
@@ -58,9 +58,9 @@ namespace MiniBank.Web.Controllers.BankAccounts
                 UserId = account.UserId,
                 AmountOfMoney = account.AmountOfMoney,
                 CurrencyCode = account.CurrencyCode,
-                Open = account.Open,
-                TimeOfOpening = account.TimeOfOpening,
-                TimeOfClosing = account.TimeOfClosing
+                IsOpened = account.IsOpened,
+                OpenDate = account.OpenDate,
+                CloseDate = account.CloseDate
             });
         }
 
