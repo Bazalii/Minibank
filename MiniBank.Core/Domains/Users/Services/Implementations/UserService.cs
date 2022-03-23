@@ -18,14 +18,19 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
             _bankAccountRepository = bankAccountRepository;
         }
 
-        public void AddUser(User user)
+        public void Add(UserCreationModel model)
         {
-            _userRepository.Add(user);
+            _userRepository.Add(new User
+            {
+                Id = Guid.NewGuid(),
+                Login = model.Login,
+                Email = model.Email
+            });
         }
 
-        public User GetUserById(Guid id)
+        public User GetById(Guid id)
         {
-            return _userRepository.GetUserById(id);
+            return _userRepository.GetById(id);
         }
 
         public IEnumerable<User> GetAll()
@@ -33,19 +38,19 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
             return _userRepository.GetAll();
         }
 
-        public void UpdateUser(User user)
+        public void Update(User user)
         {
             _userRepository.Update(user);
         }
 
-        public void DeleteUserById(Guid id)
+        public void DeleteById(Guid id)
         {
             if (_bankAccountRepository.ExistsForUser(id))
             {
                 throw new ValidationException($"User with id: {id} has connected accounts!");
             }
 
-            _userRepository.DeleteUserById(id);
+            _userRepository.DeleteById(id);
         }
     }
 }

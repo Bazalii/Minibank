@@ -26,7 +26,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
             });
         }
 
-        public BankAccount GetAccountById(Guid id)
+        public BankAccount GetById(Guid id)
         {
             var dbModel = _accounts.FirstOrDefault(account => account.Id == id);
             if (dbModel == null)
@@ -88,7 +88,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
             dbModel.AmountOfMoney = amountOfMoney;
         }
 
-        public void DeleteAccountById(Guid id)
+        public void DeleteById(Guid id)
         {
             var dbModel = _accounts.FirstOrDefault(currentAccount => currentAccount.Id == id);
             if (dbModel == null)

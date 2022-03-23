@@ -5,14 +5,14 @@ namespace MiniBank.Core.Domains.Users.Services
 {
     public interface IUserService
     {
-        void AddUser(User user);
+        void Add(UserCreationModel model);
 
-        public User GetUserById(Guid id);
+        User GetById(Guid id);
 
-        public IEnumerable<User> GetAll();
+        IEnumerable<User> GetAll();
 
-        public void UpdateUser(User user);
+        void Update(User user);
 
-        public void DeleteUserById(Guid id);
+        void DeleteById(Guid id);
     }
 }

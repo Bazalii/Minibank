@@ -21,7 +21,7 @@ namespace MiniBank.Data.Users.Repositories
             });
         }
 
-        public User GetUserById(Guid id)
+        public User GetById(Guid id)
         {
             var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == id);
             if (dbModel == null)
@@ -59,19 +59,20 @@ namespace MiniBank.Data.Users.Repositories
             dbModel.Email = user.Email;
         }
 
-        public void DeleteUserById(Guid id)
+        public void DeleteById(Guid id)
         {
-            _users.RemoveAt(Exists(id));
+            _users.RemoveAt(GetIndex(id));
         }
 
-        public int Exists(Guid id)
+        public bool Exists(Guid id)
+        {
+            var index = GetIndex(id);
+            return index != -1;
+        }
+
+        private int GetIndex(Guid id)
         {
             var index = _users.FindIndex(currentUser => currentUser.Id == id);
-            if (index == -1)
-            {
-                throw new ObjectNotFoundException($"User with id: {id} is not found!");
-            }
-
             return index;
         }
     }

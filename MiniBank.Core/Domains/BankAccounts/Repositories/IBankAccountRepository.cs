@@ -7,7 +7,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Repositories
     {
         void Add(BankAccount bankAccount);
 
-        BankAccount GetAccountById(Guid id);
+        BankAccount GetById(Guid id);
 
         IEnumerable<BankAccount> GetAll();
 
@@ -15,7 +15,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Repositories
 
         void UpdateAccountMoney(Guid id, double amountOfMoney);
 
-        void DeleteAccountById(Guid id);
+        void DeleteById(Guid id);
 
         bool ExistsForUser(Guid accountId);
     }

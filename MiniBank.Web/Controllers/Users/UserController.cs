@@ -22,9 +22,8 @@ namespace MiniBank.Web.Controllers.Users
         [HttpPost]
         public void Create(UserCreationRequest model)
         {
-            _userService.AddUser(new User
+            _userService.Add(new UserCreationModel
             {
-                Id = Guid.NewGuid(),
                 Email = model.Email,
                 Login = model.Login
             });
@@ -33,7 +32,7 @@ namespace MiniBank.Web.Controllers.Users
         [HttpGet("{id:guid}")]
         public UserResponse Get(Guid id)
         {
-            var model = _userService.GetUserById(id);
+            var model = _userService.GetById(id);
             return new UserResponse
             {
                 Id = model.Id,
@@ -56,7 +55,7 @@ namespace MiniBank.Web.Controllers.Users
         [HttpPut]
         public void Update(Guid id, UserUpdateRequest model)
         {
-            _userService.UpdateUser(new User
+            _userService.Update(new User
             {
                 Id = id,
                 Email = model.Email,
@@ -67,7 +66,7 @@ namespace MiniBank.Web.Controllers.Users
         [HttpDelete]
         public void Delete(Guid id)
         {
-            _userService.DeleteUserById(id);
+            _userService.DeleteById(id);
         }
     }
 }

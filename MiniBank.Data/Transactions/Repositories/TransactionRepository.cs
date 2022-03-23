@@ -22,7 +22,7 @@ namespace MiniBank.Data.Transactions.Repositories
             });
         }
 
-        public Transaction GetTransactionById(Guid id)
+        public Transaction GetById(Guid id)
         {
             var dbModel = _transactions.FirstOrDefault(transaction => transaction.Id == id);
             if (dbModel == null)
@@ -54,7 +54,7 @@ namespace MiniBank.Data.Transactions.Repositories
             dbModel.ReplenishmentAccount = transaction.ReplenishmentAccount;
         }
 
-        public void DeleteTransactionById(Guid id)
+        public void DeleteById(Guid id)
         {
             var dbModel = _transactions.FirstOrDefault(transaction => transaction.Id == id);
             if (dbModel == null)

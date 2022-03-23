@@ -29,15 +29,27 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             _transactionRepository = transactionRepository;
         }
 
-        public void AddAccount(BankAccount bankAccount)
+        public void Add(BankAccountCreationModel model)
         {
-            _userRepository.Exists(bankAccount.UserId);
-            _bankAccountRepository.Add(bankAccount);
+            if (!_userRepository.Exists(model.UserId))
+            {
+                throw new ValidationException($"User with id: {model.UserId} is not found!");
+            }
+
+            _bankAccountRepository.Add(new BankAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = model.UserId,
+                AmountOfMoney = model.AmountOfMoney,
+                CurrencyCode = model.CurrencyCode,
+                IsOpened = true,
+                OpenDate = DateTime.Now
+            });
         }
 
-        public BankAccount GetAccountById(Guid id)
+        public BankAccount GetById(Guid id)
         {
-            return _bankAccountRepository.GetAccountById(id);
+            return _bankAccountRepository.GetById(id);
         }
 
         public IEnumerable<BankAccount> GetAll()
@@ -45,7 +57,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             return _bankAccountRepository.GetAll();
         }
 
-        public void UpdateAccount(BankAccount bankAccount)
+        public void Update(BankAccount bankAccount)
         {
             _bankAccountRepository.Update(bankAccount);
         }
@@ -57,7 +69,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public void CloseAccountById(Guid id)
         {
-            var model = _bankAccountRepository.GetAccountById(id);
+            var model = _bankAccountRepository.GetById(id);
             if (model.AmountOfMoney != 0)
             {
                 throw new ValidationException(
@@ -78,8 +90,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public double CalculateCommission(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)
         {
-            var withdrawalAccount = _bankAccountRepository.GetAccountById(withdrawalAccountId);
-            var replenishmentAccount = _bankAccountRepository.GetAccountById(replenishmentAccountId);
+            var withdrawalAccount = _bankAccountRepository.GetById(withdrawalAccountId);
+            var replenishmentAccount = _bankAccountRepository.GetById(replenishmentAccountId);
             if (withdrawalAccount.UserId == replenishmentAccount.UserId) return 0;
 
             var result = Math.Round(amount * 0.02, 2);
@@ -94,8 +106,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 throw new ValidationException("Money can be transferred only between different accounts!");
             }
 
-            var withdrawalAccount = _bankAccountRepository.GetAccountById(withdrawalAccountId);
-            var replenishmentAccount = _bankAccountRepository.GetAccountById(replenishmentAccountId);
+            var withdrawalAccount = _bankAccountRepository.GetById(withdrawalAccountId);
+            var replenishmentAccount = _bankAccountRepository.GetById(replenishmentAccountId);
 
             _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId, withdrawalAccount.AmountOfMoney - amount);
 

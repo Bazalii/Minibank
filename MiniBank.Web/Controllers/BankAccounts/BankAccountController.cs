@@ -22,21 +22,18 @@ namespace MiniBank.Web.Controllers.BankAccounts
         [HttpPost]
         public void Create(BankAccountCreationRequest model)
         {
-            _bankAccountService.AddAccount(new BankAccount
+            _bankAccountService.Add(new BankAccountCreationModel
             {
-                Id = Guid.NewGuid(),
                 UserId = model.UserId,
                 AmountOfMoney = model.AmountOfMoney,
-                CurrencyCode = model.CurrencyCode,
-                IsOpened = true,
-                OpenDate = DateTime.Now
+                CurrencyCode = model.CurrencyCode
             });
         }
 
         [HttpGet("{id:guid}")]
         public BankAccountResponse Get(Guid id)
         {
-            var model = _bankAccountService.GetAccountById(id);
+            var model = _bankAccountService.GetById(id);
             return new BankAccountResponse
             {
                 Id = model.Id,

@@ -6,10 +6,10 @@ namespace MiniBank.Core.Domains.Transactions.Repositories
     {
         void Add(Transaction transaction);
 
-        public Transaction GetTransactionById(Guid id);
+        Transaction GetById(Guid id);
 
-        public void Update(Transaction transaction);
+        void Update(Transaction transaction);
 
-        public void DeleteTransactionById(Guid id);
+        void DeleteById(Guid id);
     }
 }

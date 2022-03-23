@@ -5,13 +5,13 @@ namespace MiniBank.Core.Domains.BankAccounts.Services
 {
     public interface IBankAccountService
     {
-        void AddAccount(BankAccount bankAccount);
+        void Add(BankAccountCreationModel model);
 
-        BankAccount GetAccountById(Guid id);
+        BankAccount GetById(Guid id);
 
         IEnumerable<BankAccount> GetAll();
 
-        void UpdateAccount(BankAccount bankAccount);
+        void Update(BankAccount bankAccount);
 
         void UpdateMoneyOnAccount(Guid id, double amountOfMoney);
 
