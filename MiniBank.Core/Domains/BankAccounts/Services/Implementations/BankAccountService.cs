@@ -76,16 +76,10 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                     $"Amount of money on account with id: {id} that you want to close should be 0!");
             }
 
-            _bankAccountRepository.Update(new BankAccount
-            {
-                Id = model.Id,
-                UserId = model.UserId,
-                AmountOfMoney = model.AmountOfMoney,
-                CurrencyCode = model.CurrencyCode,
-                IsOpened = false,
-                OpenDate = model.OpenDate,
-                CloseDate = DateTime.Now
-            });
+            model.IsOpened = false;
+            model.CloseDate = DateTime.Now;
+            
+            _bankAccountRepository.Update(model);
         }
 
         public double CalculateCommission(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)

@@ -20,10 +20,9 @@ namespace MiniBank.Core.Domains.CurrencyConverting.Services.Implementations
                 throw new ValidationException("The amount of money cannot be negative!");
             }
 
-            var result =
-                Math.Round(
-                    amount * _exchangeRateProvider.GetCourse(fromCurrency.ToString()) /
-                    _exchangeRateProvider.GetCourse(toCurrency.ToString()), 2);
+            var fromCourse = _exchangeRateProvider.GetCourse(fromCurrency.ToString());
+            var toCourse = _exchangeRateProvider.GetCourse(toCurrency.ToString());
+            var result = Math.Round(amount * fromCourse / toCourse, 2);
 
             return result;
         }
