@@ -11,11 +11,15 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
         private readonly IUserRepository _userRepository;
 
         private readonly IBankAccountRepository _bankAccountRepository;
+        
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IUserRepository userRepository, IBankAccountRepository bankAccountRepository)
+        public UserService(IUserRepository userRepository, IBankAccountRepository bankAccountRepository,
+            IUnitOfWork unitOfWork)
         {
             _userRepository = userRepository;
             _bankAccountRepository = bankAccountRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public void Add(UserCreationModel model)
@@ -26,6 +30,8 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
                 Login = model.Login,
                 Email = model.Email
             });
+            
+            _unitOfWork.SaveChanges();
         }
 
         public User GetById(Guid id)
@@ -41,6 +47,7 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
         public void Update(User user)
         {
             _userRepository.Update(user);
+            _unitOfWork.SaveChanges();
         }
 
         public void DeleteById(Guid id)
@@ -51,6 +58,7 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
             }
 
             _userRepository.DeleteById(id);
+            _unitOfWork.SaveChanges();
         }
     }
 }

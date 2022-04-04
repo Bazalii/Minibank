@@ -19,14 +19,17 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
         private readonly ITransactionRepository _transactionRepository;
 
         private readonly ICurrencyConverter _currencyConverter;
+        
+        private readonly IUnitOfWork _unitOfWork;
 
         public BankAccountService(IBankAccountRepository bankAccountRepository, IUserRepository userRepository,
-            ICurrencyConverter currencyConverter, ITransactionRepository transactionRepository)
+            ICurrencyConverter currencyConverter, ITransactionRepository transactionRepository, IUnitOfWork unitOfWork)
         {
             _bankAccountRepository = bankAccountRepository;
             _userRepository = userRepository;
             _currencyConverter = currencyConverter;
             _transactionRepository = transactionRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public void Add(BankAccountCreationModel model)
@@ -45,6 +48,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 IsOpened = true,
                 OpenDate = DateTime.Now
             });
+
+            _unitOfWork.SaveChanges();
         }
 
         public BankAccount GetById(Guid id)
@@ -60,11 +65,13 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
         public void Update(BankAccount bankAccount)
         {
             _bankAccountRepository.Update(bankAccount);
+            _unitOfWork.SaveChanges();
         }
 
         public void UpdateMoneyOnAccount(Guid id, double amountOfMoney)
         {
             _bankAccountRepository.UpdateAccountMoney(id, amountOfMoney);
+            _unitOfWork.SaveChanges();
         }
 
         public void CloseAccountById(Guid id)
@@ -80,6 +87,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             model.CloseDate = DateTime.Now;
             
             _bankAccountRepository.Update(model);
+            _unitOfWork.SaveChanges();
         }
 
         public double CalculateCommission(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)
@@ -124,6 +132,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 ReplenishmentAccount = replenishmentAccountId,
                 AmountOfMoney = finalAmount
             });
+            
+            _unitOfWork.SaveChanges();
         }
     }
 }
