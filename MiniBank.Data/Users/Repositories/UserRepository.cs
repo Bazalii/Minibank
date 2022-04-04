@@ -84,6 +84,12 @@ namespace MiniBank.Data.Users.Repositories
             return dbModel != null;
         }
 
+        public async Task<bool> IsLoginExists(string login)
+        {
+            var dbModel = await _context.Users.FirstOrDefaultAsync(user => user.Login == login);
+            return dbModel != null;
+        }
+
         private async Task<UserDbModel> FindUser(Guid id)
         {
             var dbModel = await _context.Users.FindAsync(id);

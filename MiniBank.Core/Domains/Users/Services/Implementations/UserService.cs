@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentValidation;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
-using MiniBank.Core.Exceptions;
+using ValidationException = MiniBank.Core.Exceptions.ValidationException;
 
 namespace MiniBank.Core.Domains.Users.Services.Implementations
 {
@@ -12,19 +13,24 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
         private readonly IUserRepository _userRepository;
 
         private readonly IBankAccountRepository _bankAccountRepository;
-        
+
         private readonly IUnitOfWork _unitOfWork;
 
+        private readonly IValidator<UserCreationModel> _userValidator;
+
         public UserService(IUserRepository userRepository, IBankAccountRepository bankAccountRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork, IValidator<UserCreationModel> userValidator)
         {
             _userRepository = userRepository;
             _bankAccountRepository = bankAccountRepository;
             _unitOfWork = unitOfWork;
+            _userValidator = userValidator;
         }
 
         public async Task Add(UserCreationModel model)
         {
+            await _userValidator.ValidateAndThrowAsync(model);
+            
             await _userRepository.Add(new User
             {
                 Id = Guid.NewGuid(),

@@ -17,5 +17,7 @@ namespace MiniBank.Core.Domains.Users.Repositories
         Task DeleteById(Guid id);
 
         Task<bool> Exists(Guid id);
+
+        Task<bool> IsLoginExists(string login);
     }
 }
