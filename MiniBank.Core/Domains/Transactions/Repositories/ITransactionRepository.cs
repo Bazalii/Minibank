@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace MiniBank.Core.Domains.Transactions.Repositories
 {
     public interface ITransactionRepository
     {
-        void Add(Transaction transaction);
+        Task Add(Transaction transaction);
 
-        Transaction GetById(Guid id);
+        Task<Transaction> GetById(Guid id);
 
-        void Update(Transaction transaction);
+        Task Update(Transaction transaction);
 
-        void DeleteById(Guid id);
+        Task DeleteById(Guid id);
     }
 }

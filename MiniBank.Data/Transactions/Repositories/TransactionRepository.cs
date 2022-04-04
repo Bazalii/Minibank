@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Repositories;
@@ -16,9 +17,9 @@ namespace MiniBank.Data.Transactions.Repositories
             _context = context;
         }
 
-        public void Add(Transaction transaction)
+        public async Task Add(Transaction transaction)
         {
-            _context.Transactions.Add(new TransactionDbModel
+            await _context.Transactions.AddAsync(new TransactionDbModel
             {
                 Id = transaction.Id,
                 AmountOfMoney = transaction.AmountOfMoney,
@@ -27,11 +28,12 @@ namespace MiniBank.Data.Transactions.Repositories
             });
         }
 
-        public Transaction GetById(Guid id)
+        public async Task<Transaction> GetById(Guid id)
         {
-            var dbModel = _context.Transactions
+            var dbModel = await _context.Transactions
                 .AsNoTracking()
-                .FirstOrDefault(transaction => transaction.Id == id);
+                .FirstOrDefaultAsync(transaction => transaction.Id == id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
@@ -46,10 +48,12 @@ namespace MiniBank.Data.Transactions.Repositories
             };
         }
 
-        public void Update(Transaction transaction)
+        public async Task Update(Transaction transaction)
         {
             var dbModel =
-                _context.Transactions.FirstOrDefault(currentTransaction => currentTransaction.Id == transaction.Id);
+                await _context.Transactions.FirstOrDefaultAsync(currentTransaction =>
+                    currentTransaction.Id == transaction.Id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {transaction.Id} is not found!");
@@ -61,9 +65,10 @@ namespace MiniBank.Data.Transactions.Repositories
             dbModel.ReplenishmentAccount = transaction.ReplenishmentAccount;
         }
 
-        public void DeleteById(Guid id)
+        public async Task DeleteById(Guid id)
         {
-            var dbModel = _context.Transactions.FirstOrDefault(transaction => transaction.Id == id);
+            var dbModel = await _context.Transactions.FirstOrDefaultAsync(transaction => transaction.Id == id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
