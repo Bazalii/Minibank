@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Repositories;
 using MiniBank.Data.Exceptions;
@@ -9,11 +9,16 @@ namespace MiniBank.Data.Transactions.Repositories
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly List<TransactionDbModel> _transactions = new();
+        private readonly MiniBankContext _context;
+
+        public TransactionRepository(MiniBankContext context)
+        {
+            _context = context;
+        }
 
         public void Add(Transaction transaction)
         {
-            _transactions.Add(new TransactionDbModel
+            _context.Transactions.Add(new TransactionDbModel
             {
                 Id = transaction.Id,
                 AmountOfMoney = transaction.AmountOfMoney,
@@ -24,7 +29,9 @@ namespace MiniBank.Data.Transactions.Repositories
 
         public Transaction GetById(Guid id)
         {
-            var dbModel = _transactions.FirstOrDefault(transaction => transaction.Id == id);
+            var dbModel = _context.Transactions
+                .AsNoTracking()
+                .FirstOrDefault(transaction => transaction.Id == id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
@@ -42,7 +49,7 @@ namespace MiniBank.Data.Transactions.Repositories
         public void Update(Transaction transaction)
         {
             var dbModel =
-                _transactions.FirstOrDefault(currentTransaction => currentTransaction.Id == transaction.Id);
+                _context.Transactions.FirstOrDefault(currentTransaction => currentTransaction.Id == transaction.Id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {transaction.Id} is not found!");
@@ -56,13 +63,13 @@ namespace MiniBank.Data.Transactions.Repositories
 
         public void DeleteById(Guid id)
         {
-            var dbModel = _transactions.FirstOrDefault(transaction => transaction.Id == id);
+            var dbModel = _context.Transactions.FirstOrDefault(transaction => transaction.Id == id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
             }
 
-            _transactions.Remove(dbModel);
+            _context.Transactions.Remove(dbModel);
         }
     }
 }
