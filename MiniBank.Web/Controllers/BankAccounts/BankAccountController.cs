@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MiniBank.Core.Domains.BankAccounts;
 using MiniBank.Core.Domains.BankAccounts.Services;
@@ -20,9 +21,9 @@ namespace MiniBank.Web.Controllers.BankAccounts
         }
 
         [HttpPost]
-        public void Create(BankAccountCreationRequest model)
+        public Task Create(BankAccountCreationRequest model)
         {
-            _bankAccountService.Add(new BankAccountCreationModel
+            return _bankAccountService.Add(new BankAccountCreationModel
             {
                 UserId = model.UserId,
                 AmountOfMoney = model.AmountOfMoney,
@@ -31,9 +32,9 @@ namespace MiniBank.Web.Controllers.BankAccounts
         }
 
         [HttpGet("{id:guid}")]
-        public BankAccountResponse Get(Guid id)
+        public async Task<BankAccountResponse> Get(Guid id)
         {
-            var model = _bankAccountService.GetById(id);
+            var model = await _bankAccountService.GetById(id);
             return new BankAccountResponse
             {
                 Id = model.Id,
@@ -47,9 +48,10 @@ namespace MiniBank.Web.Controllers.BankAccounts
         }
 
         [HttpGet]
-        public IEnumerable<BankAccountResponse> GetAll()
+        public async Task<IEnumerable<BankAccountResponse>> GetAll()
         {
-            return _bankAccountService.GetAll().Select(account => new BankAccountResponse
+            var bankAccounts = await _bankAccountService.GetAll();
+            return bankAccounts.Select(account => new BankAccountResponse
             {
                 Id = account.Id,
                 UserId = account.UserId,
@@ -62,23 +64,23 @@ namespace MiniBank.Web.Controllers.BankAccounts
         }
 
         [HttpPut("{id:guid}")]
-        public void Update(Guid id, BankAccountMoneyUpdateRequest model)
+        public Task Update(Guid id, BankAccountMoneyUpdateRequest model)
         {
-            _bankAccountService.UpdateMoneyOnAccount(id, model.AmountOfMoney);
+            return _bankAccountService.UpdateMoneyOnAccount(id, model.AmountOfMoney);
         }
 
         [HttpPost]
         [Route("/close")]
-        public void CloseAccount(Guid id)
+        public Task CloseAccount(Guid id)
         {
-            _bankAccountService.CloseAccountById(id);
+            return _bankAccountService.CloseAccountById(id);
         }
 
         [HttpPost]
         [Route("/transferMoney")]
-        public void TransferMoney(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)
+        public Task TransferMoney(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)
         {
-            _bankAccountService.TransferMoney(amount, withdrawalAccountId, replenishmentAccountId);
+            return _bankAccountService.TransferMoney(amount, withdrawalAccountId, replenishmentAccountId);
         }
     }
 }

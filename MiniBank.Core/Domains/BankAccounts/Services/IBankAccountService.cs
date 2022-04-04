@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MiniBank.Core.Domains.BankAccounts.Services
 {
     public interface IBankAccountService
     {
-        void Add(BankAccountCreationModel model);
+        Task Add(BankAccountCreationModel model);
 
-        BankAccount GetById(Guid id);
+        Task<BankAccount> GetById(Guid id);
 
-        IEnumerable<BankAccount> GetAll();
+        Task<IEnumerable<BankAccount>> GetAll();
 
-        void Update(BankAccount bankAccount);
+        Task Update(BankAccount bankAccount);
 
-        void UpdateMoneyOnAccount(Guid id, double amountOfMoney);
+        Task UpdateMoneyOnAccount(Guid id, double amountOfMoney);
 
-        void CloseAccountById(Guid id);
+        Task CloseAccountById(Guid id);
 
-        double CalculateCommission(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId);
+        Task<double> CalculateCommission(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId);
 
-        void TransferMoney(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId);
+        Task TransferMoney(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.BankAccounts;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
@@ -18,9 +19,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
             _context = context;
         }
 
-        public void Add(BankAccount bankAccount)
+        public async Task Add(BankAccount bankAccount)
         {
-            _context.BankAccounts.Add(new BankAccountDbModel
+            await _context.BankAccounts.AddAsync(new BankAccountDbModel
             {
                 Id = bankAccount.Id,
                 UserId = bankAccount.UserId,
@@ -32,11 +33,12 @@ namespace MiniBank.Data.BankAccounts.Repositories
             });
         }
 
-        public BankAccount GetById(Guid id)
+        public async Task<BankAccount> GetById(Guid id)
         {
-            var dbModel = _context.BankAccounts
+            var dbModel = await _context.BankAccounts
                 .AsNoTracking()
-                .FirstOrDefault(account => account.Id == id);
+                .FirstOrDefaultAsync(account => account.Id == id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -54,9 +56,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
             };
         }
 
-        public IEnumerable<BankAccount> GetAll()
+        public async Task<IEnumerable<BankAccount>> GetAll()
         {
-            return _context.BankAccounts.Select(account => new BankAccount
+            return await _context.BankAccounts.Select(account => new BankAccount
             {
                 Id = account.Id,
                 UserId = account.UserId,
@@ -65,12 +67,13 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 IsOpened = account.IsOpened,
                 OpenDate = account.OpenDate,
                 CloseDate = account.CloseDate
-            });
+            }).ToListAsync();
         }
 
-        public void Update(BankAccount bankAccount)
+        public async Task Update(BankAccount bankAccount)
         {
-            var dbModel = _context.BankAccounts.FirstOrDefault(account => account.Id == bankAccount.Id);
+            var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == bankAccount.Id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {bankAccount.Id} is not found!");
@@ -85,9 +88,10 @@ namespace MiniBank.Data.BankAccounts.Repositories
             dbModel.CloseDate = bankAccount.CloseDate;
         }
 
-        public void UpdateAccountMoney(Guid id, double amountOfMoney)
+        public async Task UpdateAccountMoney(Guid id, double amountOfMoney)
         {
-            var dbModel = _context.BankAccounts.FirstOrDefault(account => account.Id == id);
+            var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -96,9 +100,10 @@ namespace MiniBank.Data.BankAccounts.Repositories
             dbModel.AmountOfMoney = amountOfMoney;
         }
 
-        public void DeleteById(Guid id)
+        public async Task DeleteById(Guid id)
         {
-            var dbModel = _context.BankAccounts.FirstOrDefault(currentAccount => currentAccount.Id == id);
+            var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(currentAccount => currentAccount.Id == id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -113,9 +118,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
             _context.BankAccounts.Remove(dbModel);
         }
 
-        public bool ExistsForUser(Guid userId)
+        public async Task<bool> ExistsForUser(Guid userId)
         {
-            return _context.BankAccounts.FirstOrDefault(account => account.UserId == userId) != null;
+            return await _context.BankAccounts.FirstOrDefaultAsync(account => account.UserId == userId) != null;
         }
     }
 }
