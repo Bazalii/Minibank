@@ -24,6 +24,11 @@ namespace MiniBank.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(MiniBankContext).Assembly);
             base.OnModelCreating(modelBuilder);
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+        }
     }
     
     public class Factory : IDesignTimeDbContextFactory<MiniBankContext>
