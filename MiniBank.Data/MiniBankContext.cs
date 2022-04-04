@@ -9,14 +9,13 @@ namespace MiniBank.Data
     public class MiniBankContext : DbContext
     {
         public DbSet<UserDbModel> Users { get; set; }
-        
+
         public DbSet<BankAccountDbModel> BankAccounts { get; set; }
-        
+
         public DbSet<TransactionDbModel> Transactions { get; set; }
 
         public MiniBankContext(DbContextOptions options) : base(options)
         {
-            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,7 +29,7 @@ namespace MiniBank.Data
             optionsBuilder.UseLazyLoadingProxies();
         }
     }
-    
+
     public class Factory : IDesignTimeDbContextFactory<MiniBankContext>
     {
         public MiniBankContext CreateDbContext(string[] args)

@@ -38,7 +38,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
             var dbModel = await _context.BankAccounts
                 .AsNoTracking()
                 .FirstOrDefaultAsync(account => account.Id == id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -73,7 +73,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
         public async Task Update(BankAccount bankAccount)
         {
             var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == bankAccount.Id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {bankAccount.Id} is not found!");
@@ -91,7 +91,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
         public async Task UpdateAccountMoney(Guid id, double amountOfMoney)
         {
             var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -103,7 +103,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
         public async Task DeleteById(Guid id)
         {
             var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(currentAccount => currentAccount.Id == id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");

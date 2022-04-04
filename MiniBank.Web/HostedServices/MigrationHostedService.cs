@@ -28,10 +28,10 @@ namespace MiniBank.Web.HostedServices
                 {
                     throw new ServiceNotRegisteredException($"{nameof(MiniBankContext)} is not registered!");
                 }
-                
+
                 context.Database.Migrate();
             }
-            
+
             return Task.CompletedTask;
         }
 

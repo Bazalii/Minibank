@@ -33,7 +33,7 @@ namespace MiniBank.Data.Transactions.Repositories
             var dbModel = await _context.Transactions
                 .AsNoTracking()
                 .FirstOrDefaultAsync(transaction => transaction.Id == id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");
@@ -53,7 +53,7 @@ namespace MiniBank.Data.Transactions.Repositories
             var dbModel =
                 await _context.Transactions.FirstOrDefaultAsync(currentTransaction =>
                     currentTransaction.Id == transaction.Id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {transaction.Id} is not found!");
@@ -68,7 +68,7 @@ namespace MiniBank.Data.Transactions.Repositories
         public async Task DeleteById(Guid id)
         {
             var dbModel = await _context.Transactions.FirstOrDefaultAsync(transaction => transaction.Id == id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Transaction with id: {id} is not found!");

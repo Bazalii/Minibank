@@ -13,7 +13,7 @@ namespace MiniBank.Data.Transactions
         public Guid WithdrawalAccount { get; set; }
 
         public Guid ReplenishmentAccount { get; set; }
-        
+
         internal class Map : IEntityTypeConfiguration<TransactionDbModel>
         {
             public void Configure(EntityTypeBuilder<TransactionDbModel> builder)

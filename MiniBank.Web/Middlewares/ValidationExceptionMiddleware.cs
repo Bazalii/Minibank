@@ -33,13 +33,13 @@ namespace MiniBank.Web.Middlewares
                     .Select(error => $"{error.PropertyName}: {error.ErrorMessage}");
 
                 var errorMessage = string.Join(Environment.NewLine, errors);
-                
+
                 await httpContext.Response.WriteAsJsonAsync(new {Error = $"{errorMessage}"});
             }
             catch (ObjectNotFoundException objectNotFoundException)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{objectNotFoundException.Message}" });
+                await httpContext.Response.WriteAsJsonAsync(new {Error = $"{objectNotFoundException.Message}"});
             }
         }
     }

@@ -18,7 +18,8 @@ namespace MiniBank.Web.Controllers.Converting
 
         [HttpGet]
         [Route("/convert")]
-        public async Task<double> ConvertOneCurrencyToAnother(int amount, Currencies fromCurrency, Currencies toCurrency)
+        public async Task<double> ConvertOneCurrencyToAnother(int amount, Currencies fromCurrency,
+            Currencies toCurrency)
         {
             var convertedSum = await _currencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
             return convertedSum;

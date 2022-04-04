@@ -17,7 +17,7 @@ namespace MiniBank.Core.Domains.Users.Validators
                     return !exists;
                 })
                 .WithMessage("should be unique!");
-            
+
             RuleFor(x => x.Email).NotEmpty().WithMessage("cannot be empty!");
             RuleFor(x => x.Email).MustAsync((email, _) => Task.FromResult(email.Contains('@')))
                 .WithMessage("should contain @!");

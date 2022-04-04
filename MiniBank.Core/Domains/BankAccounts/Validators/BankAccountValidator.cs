@@ -1,17 +1,17 @@
 ﻿using FluentValidation;
 using MiniBank.Core.Domains.Users.Repositories;
 
-namespace MiniBank.Core.Domains.BankAccounts.Validators;
-
-public class BankAccountValidator : AbstractValidator<BankAccountCreationModel>
+namespace MiniBank.Core.Domains.BankAccounts.Validators
 {
-    public BankAccountValidator(IUserRepository userRepository)
+    public class BankAccountValidator : AbstractValidator<BankAccountCreationModel>
     {
-        RuleFor(x => x.UserId).MustAsync(async (userId, _) =>
+        public BankAccountValidator(IUserRepository userRepository)
         {
-            var userExists = await userRepository.Exists(userId);
-            return userExists;
-        })
-            .WithMessage("user with entered Id doesn't exist!");
+            RuleFor(x => x.UserId).MustAsync(async (userId, _) =>
+            {
+                var userExists = await userRepository.Exists(userId);
+                return userExists;
+            }).WithMessage("user with entered Id doesn't exist!");
+        }
     }
 }

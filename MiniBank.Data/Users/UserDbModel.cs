@@ -14,7 +14,7 @@ namespace MiniBank.Data.Users
         public string Login { get; set; }
 
         public string Email { get; set; }
-        
+
         public virtual List<BankAccountDbModel> BankAccounts { get; set; }
 
         internal class Map : IEntityTypeConfiguration<UserDbModel>

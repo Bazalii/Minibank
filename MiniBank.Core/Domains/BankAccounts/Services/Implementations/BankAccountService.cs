@@ -89,7 +89,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             await _unitOfWork.SaveChanges();
         }
 
-        public async Task<double> CalculateCommission(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId)
+        public async Task<double> CalculateCommission(double amount, Guid withdrawalAccountId,
+            Guid replenishmentAccountId)
         {
             var withdrawalAccount = await _bankAccountRepository.GetById(withdrawalAccountId);
             var replenishmentAccount = await _bankAccountRepository.GetById(replenishmentAccountId);

@@ -30,14 +30,14 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
         public async Task Add(UserCreationModel model)
         {
             await _userValidator.ValidateAndThrowAsync(model);
-            
+
             await _userRepository.Add(new User
             {
                 Id = Guid.NewGuid(),
                 Login = model.Login,
                 Email = model.Email
             });
-            
+
             await _unitOfWork.SaveChanges();
         }
 
@@ -60,7 +60,7 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
         public async Task DeleteById(Guid id)
         {
             var check = await _bankAccountRepository.ExistsForUser(id);
-            
+
             if (check)
             {
                 throw new ValidationException($"User with id: {id} has connected accounts!");

@@ -33,7 +33,7 @@ namespace MiniBank.Data.Users.Repositories
             var dbModel = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(currentUser => currentUser.Id == id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {id} is not found!");
@@ -52,17 +52,17 @@ namespace MiniBank.Data.Users.Repositories
             return await _context.Users
                 .AsNoTracking()
                 .Select(user => new User
-            {
-                Id = user.Id,
-                Login = user.Login,
-                Email = user.Email
-            }).ToListAsync();
+                {
+                    Id = user.Id,
+                    Login = user.Login,
+                    Email = user.Email
+                }).ToListAsync();
         }
 
         public async Task Update(User user)
         {
             var dbModel = await _context.Users.FirstOrDefaultAsync(currentUser => currentUser.Id == user.Id);
-            
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {user.Id} is not found!");

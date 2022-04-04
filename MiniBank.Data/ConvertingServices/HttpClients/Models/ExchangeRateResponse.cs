@@ -8,13 +8,13 @@ namespace MiniBank.Data.ConvertingServices.HttpClients.Models
     {
         public DateTime Date { get; set; }
 
-        [JsonPropertyName("Valute")] 
+        [JsonPropertyName("Valute")]
         public Dictionary<string, ValueItem> Currencies { get; set; }
     }
 
     public class ValueItem
     {
-        [JsonPropertyName("ID")] 
+        [JsonPropertyName("ID")]
         public string Id { get; set; }
 
         public string NumCode { get; set; }

@@ -11,7 +11,7 @@ namespace MiniBank.Data.BankAccounts
         public Guid Id { get; set; }
 
         public Guid UserId { get; set; }
-        
+
         public virtual UserDbModel User { get; set; }
 
         public double AmountOfMoney { get; set; }
