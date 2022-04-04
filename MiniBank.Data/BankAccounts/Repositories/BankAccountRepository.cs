@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.BankAccounts;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Exceptions;
@@ -10,11 +11,16 @@ namespace MiniBank.Data.BankAccounts.Repositories
 {
     public class BankAccountRepository : IBankAccountRepository
     {
-        private readonly List<BankAccountDbModel> _accounts = new();
+        private readonly MiniBankContext _context;
+
+        public BankAccountRepository(MiniBankContext context)
+        {
+            _context = context;
+        }
 
         public void Add(BankAccount bankAccount)
         {
-            _accounts.Add(new BankAccountDbModel
+            _context.BankAccounts.Add(new BankAccountDbModel
             {
                 Id = bankAccount.Id,
                 UserId = bankAccount.UserId,
@@ -28,7 +34,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public BankAccount GetById(Guid id)
         {
-            var dbModel = _accounts.FirstOrDefault(account => account.Id == id);
+            var dbModel = _context.BankAccounts
+                .AsNoTracking()
+                .FirstOrDefault(account => account.Id == id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -48,7 +56,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public IEnumerable<BankAccount> GetAll()
         {
-            return _accounts.Select(account => new BankAccount
+            return _context.BankAccounts.Select(account => new BankAccount
             {
                 Id = account.Id,
                 UserId = account.UserId,
@@ -62,7 +70,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public void Update(BankAccount bankAccount)
         {
-            var dbModel = _accounts.FirstOrDefault(account => account.Id == bankAccount.Id);
+            var dbModel = _context.BankAccounts.FirstOrDefault(account => account.Id == bankAccount.Id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {bankAccount.Id} is not found!");
@@ -79,7 +87,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public void UpdateAccountMoney(Guid id, double amountOfMoney)
         {
-            var dbModel = _accounts.FirstOrDefault(account => account.Id == id);
+            var dbModel = _context.BankAccounts.FirstOrDefault(account => account.Id == id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -90,7 +98,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
 
         public void DeleteById(Guid id)
         {
-            var dbModel = _accounts.FirstOrDefault(currentAccount => currentAccount.Id == id);
+            var dbModel = _context.BankAccounts.FirstOrDefault(currentAccount => currentAccount.Id == id);
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
@@ -102,12 +110,12 @@ namespace MiniBank.Data.BankAccounts.Repositories
                     $"Account to delete with id: {id} should be closed before deletion!");
             }
 
-            _accounts.Remove(dbModel);
+            _context.BankAccounts.Remove(dbModel);
         }
 
         public bool ExistsForUser(Guid userId)
         {
-            return _accounts.FirstOrDefault(account => account.UserId == userId) != null;
+            return _context.BankAccounts.FirstOrDefault(account => account.UserId == userId) != null;
         }
     }
 }
