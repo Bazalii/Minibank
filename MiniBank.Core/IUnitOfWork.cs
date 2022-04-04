@@ -1,7 +1,9 @@
-﻿namespace MiniBank.Core
+﻿using System.Threading.Tasks;
+
+namespace MiniBank.Core
 {
     public interface IUnitOfWork
     {
-        int SaveChanges();
+        Task<int> SaveChanges();
     }
 }
