@@ -18,9 +18,9 @@ namespace MiniBank.Data.Users.Repositories
             _context = context;
         }
 
-        public void Add(User user)
+        public async Task Add(User user)
         {
-            _context.Users.Add(new UserDbModel
+            await _context.Users.AddAsync(new UserDbModel
             {
                 Id = user.Id,
                 Login = user.Login,
@@ -28,11 +28,12 @@ namespace MiniBank.Data.Users.Repositories
             });
         }
 
-        public User GetById(Guid id)
+        public async Task<User> GetById(Guid id)
         {
-            var dbModel = _context.Users
+            var dbModel = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefault(currentUser => currentUser.Id == id);
+                .FirstOrDefaultAsync(currentUser => currentUser.Id == id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {id} is not found!");
@@ -46,21 +47,22 @@ namespace MiniBank.Data.Users.Repositories
             };
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAll()
         {
-            return _context.Users
+            return await _context.Users
                 .AsNoTracking()
                 .Select(user => new User
             {
                 Id = user.Id,
                 Login = user.Login,
                 Email = user.Email
-            });
+            }).ToListAsync();
         }
 
-        public void Update(User user)
+        public async Task Update(User user)
         {
-            var dbModel = _context.Users.FirstOrDefault(currentUser => currentUser.Id == user.Id);
+            var dbModel = await _context.Users.FirstOrDefaultAsync(currentUser => currentUser.Id == user.Id);
+            
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {user.Id} is not found!");
@@ -70,20 +72,21 @@ namespace MiniBank.Data.Users.Repositories
             dbModel.Email = user.Email;
         }
 
-        public void DeleteById(Guid id)
+        public async Task DeleteById(Guid id)
         {
-            _context.Users.Remove(FindUser(id));
+            var dbModel = await FindUser(id);
+            _context.Users.Remove(dbModel);
         }
 
-        public bool Exists(Guid id)
+        public async Task<bool> Exists(Guid id)
         {
-            var dbModel = FindUser(id);
+            var dbModel = await FindUser(id);
             return dbModel != null;
         }
 
-        private UserDbModel FindUser(Guid id)
+        private async Task<UserDbModel> FindUser(Guid id)
         {
-            var dbModel = _context.Users.Find(id);
+            var dbModel = await _context.Users.FindAsync(id);
             return dbModel;
         }
     }

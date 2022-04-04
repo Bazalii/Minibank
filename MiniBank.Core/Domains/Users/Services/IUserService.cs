@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MiniBank.Core.Domains.Users.Services
 {
     public interface IUserService
     {
-        void Add(UserCreationModel model);
+        Task Add(UserCreationModel model);
 
-        User GetById(Guid id);
+        Task<User> GetById(Guid id);
 
-        IEnumerable<User> GetAll();
+        Task<IEnumerable<User>> GetAll();
 
-        void Update(User user);
+        Task Update(User user);
 
-        void DeleteById(Guid id);
+        Task DeleteById(Guid id);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
 using MiniBank.Core.Exceptions;
@@ -22,43 +23,45 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public void Add(UserCreationModel model)
+        public async Task Add(UserCreationModel model)
         {
-            _userRepository.Add(new User
+            await _userRepository.Add(new User
             {
                 Id = Guid.NewGuid(),
                 Login = model.Login,
                 Email = model.Email
             });
             
-            _unitOfWork.SaveChanges();
+            await _unitOfWork.SaveChanges();
         }
 
-        public User GetById(Guid id)
+        public async Task<User> GetById(Guid id)
         {
-            return _userRepository.GetById(id);
+            return await _userRepository.GetById(id);
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAll()
         {
-            return _userRepository.GetAll();
+            return await _userRepository.GetAll();
         }
 
-        public void Update(User user)
+        public async Task Update(User user)
         {
-            _userRepository.Update(user);
-            _unitOfWork.SaveChanges();
+            await _userRepository.Update(user);
+            await _unitOfWork.SaveChanges();
         }
 
-        public void DeleteById(Guid id)
+        public async Task DeleteById(Guid id)
         {
-            if (_bankAccountRepository.ExistsForUser(id))
+            var check = await _bankAccountRepository.ExistsForUser(id);
+            
+            if (check)
             {
                 throw new ValidationException($"User with id: {id} has connected accounts!");
             }
 
-            _userRepository.DeleteById(id);
-            _unitOfWork.SaveChanges();
+            await _userRepository.DeleteById(id);
+            await _unitOfWork.SaveChanges();
         }
     }
 }
