@@ -11,6 +11,7 @@ public class BankAccountValidator : AbstractValidator<BankAccountCreationModel>
         {
             var userExists = await userRepository.Exists(userId);
             return userExists;
-        });
+        })
+            .WithMessage("user with entered Id doesn't exist!");
     }
 }

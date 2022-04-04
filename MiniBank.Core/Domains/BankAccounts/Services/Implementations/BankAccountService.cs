@@ -35,7 +35,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public async Task Add(BankAccountCreationModel model)
         {
-            await _bankAccountValidator.ValidateAsync(model);
+            await _bankAccountValidator.ValidateAndThrowAsync(model);
 
             await _bankAccountRepository.Add(new BankAccount
             {
