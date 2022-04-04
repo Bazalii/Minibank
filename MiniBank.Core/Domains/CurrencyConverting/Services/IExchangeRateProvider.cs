@@ -1,7 +1,9 @@
-﻿namespace MiniBank.Core.Domains.CurrencyConverting.Services
+﻿using System.Threading.Tasks;
+
+namespace MiniBank.Core.Domains.CurrencyConverting.Services
 {
     public interface IExchangeRateProvider
     {
-        double GetCourse(string currencyCode);
+        Task<double> GetCourse(string currencyCode);
     }
 }

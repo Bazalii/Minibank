@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
 using MiniBank.Core.Exceptions;
 using MiniBank.Data.ConvertingServices.HttpClients.Models;
@@ -16,13 +17,12 @@ namespace MiniBank.Data.ConvertingServices.HttpClients.Implementations
             _httpClient = httpClient;
         }
 
-        public double GetCourse(string currencyCode)
+        public async Task<double> GetCourse(string currencyCode)
         {
             if (currencyCode == "RUB")
                 return 1;
 
-            var response = _httpClient.GetFromJsonAsync<ExchangeRateResponse>("daily_json.js")
-                .GetAwaiter().GetResult();
+            var response = await _httpClient.GetFromJsonAsync<ExchangeRateResponse>("daily_json.js");
 
             if (!response.Currencies.ContainsKey(currencyCode))
             {
