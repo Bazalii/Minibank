@@ -17,15 +17,15 @@ namespace MiniBank.Data.Transactions.Repositories
             _context = context;
         }
 
-        public async Task Add(Transaction transaction)
+        public Task Add(Transaction transaction)
         {
-            await _context.Transactions.AddAsync(new TransactionDbModel
+            return _context.Transactions.AddAsync(new TransactionDbModel
             {
                 Id = transaction.Id,
                 AmountOfMoney = transaction.AmountOfMoney,
                 WithdrawalAccount = transaction.WithdrawalAccount,
                 ReplenishmentAccount = transaction.ReplenishmentAccount
-            });
+            }).AsTask();
         }
 
         public async Task<Transaction> GetById(Guid id)

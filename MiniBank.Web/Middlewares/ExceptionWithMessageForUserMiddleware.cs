@@ -7,11 +7,11 @@ using MiniBank.Data.Exceptions;
 
 namespace MiniBank.Web.Middlewares
 {
-    public class ValidationExceptionMiddleware
+    public class ExceptionWithMessageForUserMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public ValidationExceptionMiddleware(RequestDelegate next)
+        public ExceptionWithMessageForUserMiddleware(RequestDelegate next)
         {
             _next = next;
         }
