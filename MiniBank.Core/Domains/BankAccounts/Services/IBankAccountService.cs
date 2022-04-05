@@ -24,7 +24,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services
 
         Task TransferMoney(double amount, Guid withdrawalAccountId, Guid replenishmentAccountId,
             CancellationToken cancellationToken);
-        
+
         Task DeleteById(Guid id, CancellationToken cancellationToken);
     }
 }

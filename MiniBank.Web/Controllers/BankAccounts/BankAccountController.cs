@@ -85,7 +85,7 @@ namespace MiniBank.Web.Controllers.BankAccounts
             return _bankAccountService.TransferMoney(amount, withdrawalAccountId, replenishmentAccountId,
                 cancellationToken);
         }
-        
+
         [HttpDelete]
         public Task Delete(Guid id, CancellationToken cancellationToken)
         {

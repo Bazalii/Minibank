@@ -59,9 +59,9 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
                 Login = user.Login,
                 Email = user.Email
             }, cancellationToken);
-            
+
             await _userRepository.Update(user, cancellationToken);
-            
+
             await _unitOfWork.SaveChanges(cancellationToken);
         }
 

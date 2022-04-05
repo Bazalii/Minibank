@@ -35,7 +35,7 @@ namespace MiniBank.Data
         public MiniBankContext CreateDbContext(string[] args)
         {
             var options = new DbContextOptionsBuilder()
-                .UseNpgsql("Host=localhost;Port=5432;Database=MiniBank;Username=postgres;Password=777")
+                .UseNpgsql("FakeConnectionStringOnlyForMigrations")
                 .Options;
 
             return new MiniBankContext(options);

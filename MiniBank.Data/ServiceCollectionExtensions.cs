@@ -28,7 +28,7 @@ namespace MiniBank.Data
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddDbContext<MiniBankContext>(options => options
                 .UseLazyLoadingProxies()
-                .UseNpgsql("Host=localhost;Port=5432;Database=MiniBank;Username=postgres;Password=777"));
+                .UseNpgsql(configuration["DbConnectionString"]));
 
             return services;
         }

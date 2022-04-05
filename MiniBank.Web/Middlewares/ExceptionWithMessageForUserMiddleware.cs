@@ -25,7 +25,7 @@ namespace MiniBank.Web.Middlewares
             catch (ValidationException validationException)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await httpContext.Response.WriteAsJsonAsync(new {Error = $"{validationException.Message}"});
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{validationException.Message }"});
             }
             catch (FluentValidation.ValidationException exception)
             {
@@ -34,12 +34,12 @@ namespace MiniBank.Web.Middlewares
 
                 var errorMessage = string.Join(Environment.NewLine, errors);
 
-                await httpContext.Response.WriteAsJsonAsync(new {Error = $"{errorMessage}"});
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{errorMessage }"});
             }
             catch (ObjectNotFoundException objectNotFoundException)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-                await httpContext.Response.WriteAsJsonAsync(new {Error = $"{objectNotFoundException.Message}"});
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{objectNotFoundException.Message }"});
             }
         }
     }
