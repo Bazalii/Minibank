@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using MiniBank.Core;
 
 namespace MiniBank.Data
@@ -12,9 +13,9 @@ namespace MiniBank.Data
             _context = context;
         }
 
-        public async Task<int> SaveChanges()
+        public async Task<int> SaveChanges(CancellationToken cancellationToken)
         {
-            return await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
