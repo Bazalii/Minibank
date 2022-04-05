@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.Users;
@@ -18,21 +19,21 @@ namespace MiniBank.Data.Users.Repositories
             _context = context;
         }
 
-        public async Task Add(User user)
+        public Task Add(User user, CancellationToken cancellationToken)
         {
-            await _context.Users.AddAsync(new UserDbModel
+            return _context.Users.AddAsync(new UserDbModel
             {
                 Id = user.Id,
                 Login = user.Login,
                 Email = user.Email
-            });
+            }, cancellationToken).AsTask();
         }
 
-        public async Task<User> GetById(Guid id)
+        public async Task<User> GetById(Guid id, CancellationToken cancellationToken)
         {
             var dbModel = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(currentUser => currentUser.Id == id);
+                .FirstOrDefaultAsync(currentUser => currentUser.Id == id, cancellationToken);
 
             if (dbModel == null)
             {
@@ -47,7 +48,7 @@ namespace MiniBank.Data.Users.Repositories
             };
         }
 
-        public async Task<IEnumerable<User>> GetAll()
+        public async Task<IEnumerable<User>> GetAll(CancellationToken cancellationToken)
         {
             return await _context.Users
                 .AsNoTracking()
@@ -56,12 +57,13 @@ namespace MiniBank.Data.Users.Repositories
                     Id = user.Id,
                     Login = user.Login,
                     Email = user.Email
-                }).ToListAsync();
+                }).ToListAsync(cancellationToken);
         }
 
-        public async Task Update(User user)
+        public async Task Update(User user, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.Users.FirstOrDefaultAsync(currentUser => currentUser.Id == user.Id);
+            var dbModel =
+                await _context.Users.FirstOrDefaultAsync(currentUser => currentUser.Id == user.Id, cancellationToken);
 
             if (dbModel == null)
             {
@@ -72,28 +74,27 @@ namespace MiniBank.Data.Users.Repositories
             dbModel.Email = user.Email;
         }
 
-        public async Task DeleteById(Guid id)
+        public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await FindUser(id);
+            var dbModel = await FindUser(id, cancellationToken);
             _context.Users.Remove(dbModel);
         }
 
-        public async Task<bool> Exists(Guid id)
+        public async Task<bool> Exists(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await FindUser(id);
+            var dbModel = await FindUser(id, cancellationToken);
             return dbModel != null;
         }
 
-        public async Task<bool> IsLoginExists(string login)
+        public async Task<bool> IsLoginExists(string login, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.Users.FirstOrDefaultAsync(user => user.Login == login);
+            var dbModel = await _context.Users.FirstOrDefaultAsync(user => user.Login == login, cancellationToken);
             return dbModel != null;
         }
 
-        private async Task<UserDbModel> FindUser(Guid id)
+        private Task<UserDbModel> FindUser(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.Users.FindAsync(id);
-            return dbModel;
+            return _context.Users.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
         }
     }
 }

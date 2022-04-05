@@ -11,9 +11,9 @@ namespace MiniBank.Core.Domains.Users.Validators
             RuleFor(x => x.Login).NotEmpty().WithMessage("cannot be empty!");
             RuleFor(x => x.Login.Length).LessThanOrEqualTo(20)
                 .WithMessage("cannot contain more than 20 symbols!");
-            RuleFor(x => x.Login).MustAsync(async (login, _) =>
+            RuleFor(x => x.Login).MustAsync(async (login, cancellationToken) =>
                 {
-                    var exists = await userRepository.IsLoginExists(login);
+                    var exists = await userRepository.IsLoginExists(login, cancellationToken);
                     return !exists;
                 })
                 .WithMessage("should be unique!");
