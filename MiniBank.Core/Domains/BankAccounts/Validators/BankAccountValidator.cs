@@ -7,9 +7,9 @@ namespace MiniBank.Core.Domains.BankAccounts.Validators
     {
         public BankAccountValidator(IUserRepository userRepository)
         {
-            RuleFor(x => x.UserId).MustAsync(async (userId, _) =>
+            RuleFor(x => x.UserId).MustAsync(async (userId, cancellationToken) =>
             {
-                var userExists = await userRepository.Exists(userId);
+                var userExists = await userRepository.Exists(userId, cancellationToken);
                 return userExists;
             }).WithMessage("user with entered Id doesn't exist!");
         }

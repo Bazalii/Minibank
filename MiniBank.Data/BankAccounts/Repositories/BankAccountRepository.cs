@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.BankAccounts;
@@ -19,9 +20,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
             _context = context;
         }
 
-        public async Task Add(BankAccount bankAccount)
+        public Task Add(BankAccount bankAccount, CancellationToken cancellationToken)
         {
-            await _context.BankAccounts.AddAsync(new BankAccountDbModel
+            return _context.BankAccounts.AddAsync(new BankAccountDbModel
             {
                 Id = bankAccount.Id,
                 UserId = bankAccount.UserId,
@@ -30,14 +31,14 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 IsOpened = bankAccount.IsOpened,
                 OpenDate = bankAccount.OpenDate,
                 CloseDate = bankAccount.CloseDate
-            });
+            }, cancellationToken).AsTask();
         }
 
-        public async Task<BankAccount> GetById(Guid id)
+        public async Task<BankAccount> GetById(Guid id, CancellationToken cancellationToken)
         {
             var dbModel = await _context.BankAccounts
                 .AsNoTracking()
-                .FirstOrDefaultAsync(account => account.Id == id);
+                .FirstOrDefaultAsync(account => account.Id == id, cancellationToken);
 
             if (dbModel == null)
             {
@@ -56,7 +57,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
             };
         }
 
-        public async Task<IEnumerable<BankAccount>> GetAll()
+        public async Task<IEnumerable<BankAccount>> GetAll(CancellationToken cancellationToken)
         {
             return await _context.BankAccounts.Select(account => new BankAccount
             {
@@ -67,12 +68,14 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 IsOpened = account.IsOpened,
                 OpenDate = account.OpenDate,
                 CloseDate = account.CloseDate
-            }).ToListAsync();
+            }).ToListAsync(cancellationToken);
         }
 
-        public async Task Update(BankAccount bankAccount)
+        public async Task Update(BankAccount bankAccount, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == bankAccount.Id);
+            var dbModel =
+                await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == bankAccount.Id,
+                    cancellationToken);
 
             if (dbModel == null)
             {
@@ -88,9 +91,10 @@ namespace MiniBank.Data.BankAccounts.Repositories
             dbModel.CloseDate = bankAccount.CloseDate;
         }
 
-        public async Task UpdateAccountMoney(Guid id, double amountOfMoney)
+        public async Task UpdateAccountMoney(Guid id, double amountOfMoney, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == id);
+            var dbModel =
+                await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == id, cancellationToken);
 
             if (dbModel == null)
             {
@@ -100,9 +104,11 @@ namespace MiniBank.Data.BankAccounts.Repositories
             dbModel.AmountOfMoney = amountOfMoney;
         }
 
-        public async Task DeleteById(Guid id)
+        public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.BankAccounts.FirstOrDefaultAsync(currentAccount => currentAccount.Id == id);
+            var dbModel =
+                await _context.BankAccounts.FirstOrDefaultAsync(currentAccount => currentAccount.Id == id,
+                    cancellationToken);
 
             if (dbModel == null)
             {
@@ -118,9 +124,10 @@ namespace MiniBank.Data.BankAccounts.Repositories
             _context.BankAccounts.Remove(dbModel);
         }
 
-        public async Task<bool> ExistsForUser(Guid userId)
+        public async Task<bool> ExistsForUser(Guid userId, CancellationToken cancellationToken)
         {
-            return await _context.BankAccounts.FirstOrDefaultAsync(account => account.UserId == userId) != null;
+            return await _context.BankAccounts.FirstOrDefaultAsync(account => account.UserId == userId,
+                cancellationToken) != null;
         }
     }
 }
