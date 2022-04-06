@@ -17,10 +17,10 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
 
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly IValidator<UserCreationModel> _userValidator;
+        private readonly IValidator<User> _userValidator;
 
         public UserService(IUserRepository userRepository, IBankAccountRepository bankAccountRepository,
-            IUnitOfWork unitOfWork, IValidator<UserCreationModel> userValidator)
+            IUnitOfWork unitOfWork, IValidator<User> userValidator)
         {
             _userRepository = userRepository;
             _bankAccountRepository = bankAccountRepository;
@@ -30,14 +30,16 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
 
         public async Task Add(UserCreationModel model, CancellationToken cancellationToken)
         {
-            await _userValidator.ValidateAndThrowAsync(model, cancellationToken);
-
-            await _userRepository.Add(new User
+            var user = new User
             {
                 Id = Guid.NewGuid(),
                 Login = model.Login,
                 Email = model.Email
-            }, cancellationToken);
+            };
+            
+            await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
+
+            await _userRepository.Add(user, cancellationToken);
 
             await _unitOfWork.SaveChanges(cancellationToken);
         }
@@ -54,11 +56,7 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
 
         public async Task Update(User user, CancellationToken cancellationToken)
         {
-            await _userValidator.ValidateAndThrowAsync(new UserCreationModel
-            {
-                Login = user.Login,
-                Email = user.Email
-            }, cancellationToken);
+            await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
 
             await _userRepository.Update(user, cancellationToken);
 

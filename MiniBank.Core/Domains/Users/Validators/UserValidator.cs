@@ -4,7 +4,7 @@ using MiniBank.Core.Domains.Users.Repositories;
 
 namespace MiniBank.Core.Domains.Users.Validators
 {
-    public class UserValidator : AbstractValidator<UserCreationModel>
+    public class UserValidator : AbstractValidator<User>
     {
         public UserValidator(IUserRepository userRepository)
         {
