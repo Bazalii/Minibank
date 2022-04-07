@@ -22,9 +22,6 @@ namespace MiniBank.Data.Users
             public void Configure(EntityTypeBuilder<UserDbModel> builder)
             {
                 builder.HasKey(dbModel => dbModel.Id).HasName("pk_user");
-                builder.Property(dbModel => dbModel.Id).HasColumnName("id");
-                builder.Property(dbModel => dbModel.Login).HasColumnName("login");
-                builder.Property(dbModel => dbModel.Email).HasColumnName("email");
             }
         }
     }

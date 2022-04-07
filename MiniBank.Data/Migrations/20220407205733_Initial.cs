@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace MiniBank.Data.Migrations
 {
     public partial class Initial : Migration
@@ -8,7 +10,7 @@ namespace MiniBank.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Transactions",
+                name: "transactions",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -22,7 +24,7 @@ namespace MiniBank.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "users",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -35,7 +37,7 @@ namespace MiniBank.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BankAccounts",
+                name: "bank_accounts",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -43,36 +45,36 @@ namespace MiniBank.Data.Migrations
                     amount_of_money = table.Column<double>(type: "double precision", nullable: false),
                     currency_code = table.Column<int>(type: "integer", nullable: false),
                     is_opened = table.Column<bool>(type: "boolean", nullable: false),
-                    open_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    close_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    open_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    close_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_bank_account", x => x.id);
                     table.ForeignKey(
-                        name: "FK_BankAccounts_Users_user_id",
+                        name: "fk_bank_accounts_users_user_id",
                         column: x => x.user_id,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BankAccounts_user_id",
-                table: "BankAccounts",
+                name: "ix_bank_accounts_user_id",
+                table: "bank_accounts",
                 column: "user_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BankAccounts");
+                name: "bank_accounts");
 
             migrationBuilder.DropTable(
-                name: "Transactions");
+                name: "transactions");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "users");
         }
     }
 }

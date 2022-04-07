@@ -29,13 +29,6 @@ namespace MiniBank.Data.BankAccounts
             public void Configure(EntityTypeBuilder<BankAccountDbModel> builder)
             {
                 builder.HasKey(dbModel => dbModel.Id).HasName("pk_bank_account");
-                builder.Property(dbModel => dbModel.Id).HasColumnName("id");
-                builder.Property(dbModel => dbModel.UserId).HasColumnName("user_id");
-                builder.Property(dbModel => dbModel.AmountOfMoney).HasColumnName("amount_of_money");
-                builder.Property(dbModel => dbModel.CurrencyCode).HasColumnName("currency_code");
-                builder.Property(dbModel => dbModel.IsOpened).HasColumnName("is_opened");
-                builder.Property(dbModel => dbModel.OpenDate).HasColumnName("open_date");
-                builder.Property(dbModel => dbModel.CloseDate).HasColumnName("close_date");
                 builder.HasOne(dbModel => dbModel.User)
                     .WithMany(dbModel => dbModel.BankAccounts)
                     .HasForeignKey(dbModel => dbModel.UserId);

@@ -7,19 +7,22 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniBank.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
+#nullable disable
+
 namespace MiniBank.Data.Migrations
 {
     [DbContext(typeof(MiniBankContext))]
-    [Migration("20220404084859_Initial")]
+    [Migration("20220407205733_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityByDefaultColumns()
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.15");
+                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("MiniBank.Data.BankAccounts.BankAccountDbModel", b =>
                 {
@@ -33,7 +36,7 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("amount_of_money");
 
                     b.Property<DateTime?>("CloseDate")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("close_date");
 
                     b.Property<int>("CurrencyCode")
@@ -45,7 +48,7 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("is_opened");
 
                     b.Property<DateTime>("OpenDate")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("open_date");
 
                     b.Property<Guid>("UserId")
@@ -55,9 +58,10 @@ namespace MiniBank.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_bank_account");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_bank_accounts_user_id");
 
-                    b.ToTable("BankAccounts");
+                    b.ToTable("bank_accounts", (string)null);
                 });
 
             modelBuilder.Entity("MiniBank.Data.Transactions.TransactionDbModel", b =>
@@ -82,7 +86,7 @@ namespace MiniBank.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_transaction");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("transactions", (string)null);
                 });
 
             modelBuilder.Entity("MiniBank.Data.Users.UserDbModel", b =>
@@ -103,7 +107,7 @@ namespace MiniBank.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_user");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("MiniBank.Data.BankAccounts.BankAccountDbModel", b =>
@@ -112,7 +116,8 @@ namespace MiniBank.Data.Migrations
                         .WithMany("BankAccounts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bank_accounts_users_user_id");
 
                     b.Navigation("User");
                 });

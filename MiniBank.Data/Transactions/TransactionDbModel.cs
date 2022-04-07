@@ -19,10 +19,6 @@ namespace MiniBank.Data.Transactions
             public void Configure(EntityTypeBuilder<TransactionDbModel> builder)
             {
                 builder.HasKey(dbModel => dbModel.Id).HasName("pk_transaction");
-                builder.Property(dbModel => dbModel.Id).HasColumnName("id");
-                builder.Property(dbModel => dbModel.AmountOfMoney).HasColumnName("amount_of_money");
-                builder.Property(dbModel => dbModel.WithdrawalAccount).HasColumnName("withdrawal_account");
-                builder.Property(dbModel => dbModel.ReplenishmentAccount).HasColumnName("replenishment_account");
             }
         }
     }
