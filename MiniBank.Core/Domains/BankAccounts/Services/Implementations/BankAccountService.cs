@@ -45,7 +45,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 AmountOfMoney = model.AmountOfMoney,
                 CurrencyCode = model.CurrencyCode,
                 IsOpened = true,
-                OpenDate = DateTime.Now
+                OpenDate = DateTime.UtcNow
             }, cancellationToken);
 
             await _unitOfWork.SaveChanges(cancellationToken);
@@ -84,7 +84,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             }
 
             model.IsOpened = false;
-            model.CloseDate = DateTime.Now;
+            model.CloseDate = DateTime.UtcNow;
 
             await _bankAccountRepository.Update(model, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
@@ -114,6 +114,11 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             var withdrawalAccount = await _bankAccountRepository.GetById(withdrawalAccountId, cancellationToken);
             var replenishmentAccount = await _bankAccountRepository.GetById(replenishmentAccountId, cancellationToken);
 
+            if (withdrawalAccount.AmountOfMoney - amount < 0)
+            {
+                throw new ValidationException("Not enough money to transfer!");
+            }
+            
             await _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId,
                 withdrawalAccount.AmountOfMoney - amount, cancellationToken);
 
@@ -144,6 +149,14 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
+            var check = await _bankAccountRepository.IsOpened(id, cancellationToken);
+
+            if (check)
+            {
+                throw new ValidationException(
+                    $"Account to delete with id: {id} should be closed before deletion!");
+            }
+            
             await _bankAccountRepository.DeleteById(id, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
         }
