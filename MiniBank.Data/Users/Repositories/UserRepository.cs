@@ -76,25 +76,24 @@ namespace MiniBank.Data.Users.Repositories
 
         public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await FindUser(id, cancellationToken);
+            var dbModel = await _context.Users.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+
+            if (dbModel == null)
+            {
+                throw new ObjectNotFoundException($"User with id: {id} is not found!");
+            }
+
             _context.Users.Remove(dbModel);
         }
 
-        public async Task<bool> Exists(Guid id, CancellationToken cancellationToken)
+        public Task<bool> Exists(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await FindUser(id, cancellationToken);
-            return dbModel != null;
+            return _context.Users.AnyAsync(user => user.Id == id, cancellationToken);
         }
 
-        public async Task<bool> IsLoginExists(string login, CancellationToken cancellationToken)
+        public Task<bool> IsLoginExists(string login, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.Users.FirstOrDefaultAsync(user => user.Login == login, cancellationToken);
-            return dbModel != null;
-        }
-
-        private Task<UserDbModel> FindUser(Guid id, CancellationToken cancellationToken)
-        {
-            return _context.Users.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+            return _context.Users.AnyAsync(user => user.Login == login, cancellationToken);
         }
     }
 }
