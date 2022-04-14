@@ -115,19 +115,25 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 throw new ObjectNotFoundException($"Account with id: {id} is not found!");
             }
 
-            if (dbModel.IsOpened)
-            {
-                throw new ValidationException(
-                    $"Account to delete with id: {id} should be closed before deletion!");
-            }
-
             _context.BankAccounts.Remove(dbModel);
         }
 
-        public async Task<bool> ExistsForUser(Guid userId, CancellationToken cancellationToken)
+        public Task<bool> ExistsForUser(Guid userId, CancellationToken cancellationToken)
         {
-            return await _context.BankAccounts.FirstOrDefaultAsync(account => account.UserId == userId,
-                cancellationToken) != null;
+            return _context.BankAccounts.AnyAsync(account => account.UserId == userId, cancellationToken);
+        }
+        
+        public async Task<bool> IsOpened(Guid accountId, CancellationToken cancellationToken)
+        {
+            var dbModel =
+                await _context.BankAccounts.FirstOrDefaultAsync(account => account.Id == accountId, cancellationToken);
+
+            if (dbModel == null)
+            {
+                throw new ObjectNotFoundException($"Account with id: {accountId} is not found!");
+            }
+
+            return dbModel.IsOpened;
         }
     }
 }

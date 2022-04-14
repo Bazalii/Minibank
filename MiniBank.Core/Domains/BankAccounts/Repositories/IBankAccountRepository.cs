@@ -20,5 +20,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Repositories
         Task DeleteById(Guid id, CancellationToken cancellationToken);
 
         Task<bool> ExistsForUser(Guid accountId, CancellationToken cancellationToken);
+
+        Task<bool> IsOpened(Guid accountId, CancellationToken cancellationToken);
     }
 }
