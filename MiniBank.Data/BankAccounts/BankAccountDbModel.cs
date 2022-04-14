@@ -28,6 +28,7 @@ namespace MiniBank.Data.BankAccounts
         {
             public void Configure(EntityTypeBuilder<BankAccountDbModel> builder)
             {
+                builder.ToTable("bank_accounts");
                 builder.HasKey(dbModel => dbModel.Id).HasName("pk_bank_account");
                 builder.HasOne(dbModel => dbModel.User)
                     .WithMany(dbModel => dbModel.BankAccounts)

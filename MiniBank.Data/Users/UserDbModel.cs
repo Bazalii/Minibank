@@ -21,6 +21,7 @@ namespace MiniBank.Data.Users
         {
             public void Configure(EntityTypeBuilder<UserDbModel> builder)
             {
+                builder.ToTable("users");
                 builder.HasKey(dbModel => dbModel.Id).HasName("pk_user");
             }
         }

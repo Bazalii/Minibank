@@ -18,6 +18,7 @@ namespace MiniBank.Data.Transactions
         {
             public void Configure(EntityTypeBuilder<TransactionDbModel> builder)
             {
+                builder.ToTable("transactions");
                 builder.HasKey(dbModel => dbModel.Id).HasName("pk_transaction");
             }
         }
