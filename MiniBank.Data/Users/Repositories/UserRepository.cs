@@ -19,14 +19,14 @@ namespace MiniBank.Data.Users.Repositories
             _context = context;
         }
 
-        public Task Add(User user, CancellationToken cancellationToken)
+        public async Task Add(User user, CancellationToken cancellationToken)
         {
-            return _context.Users.AddAsync(new UserDbModel
+            await _context.Users.AddAsync(new UserDbModel
             {
                 Id = user.Id,
                 Login = user.Login,
                 Email = user.Email
-            }, cancellationToken).AsTask();
+            }, cancellationToken);
         }
 
         public async Task<User> GetById(Guid id, CancellationToken cancellationToken)

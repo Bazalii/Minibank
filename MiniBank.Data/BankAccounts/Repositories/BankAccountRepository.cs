@@ -20,9 +20,9 @@ namespace MiniBank.Data.BankAccounts.Repositories
             _context = context;
         }
 
-        public Task Add(BankAccount bankAccount, CancellationToken cancellationToken)
+        public async Task Add(BankAccount bankAccount, CancellationToken cancellationToken)
         {
-            return _context.BankAccounts.AddAsync(new BankAccountDbModel
+            await _context.BankAccounts.AddAsync(new BankAccountDbModel
             {
                 Id = bankAccount.Id,
                 UserId = bankAccount.UserId,
@@ -31,7 +31,7 @@ namespace MiniBank.Data.BankAccounts.Repositories
                 IsOpened = bankAccount.IsOpened,
                 OpenDate = bankAccount.OpenDate,
                 CloseDate = bankAccount.CloseDate
-            }, cancellationToken).AsTask();
+            }, cancellationToken);
         }
 
         public async Task<BankAccount> GetById(Guid id, CancellationToken cancellationToken)
