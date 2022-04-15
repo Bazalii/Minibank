@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,10 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MiniBank.Core;
-using MiniBank.Core.Domains.CurrencyConverting.Services;
-using MiniBank.Core.Domains.CurrencyConverting.Services.Implementations;
 using MiniBank.Data;
-using MiniBank.Data.ConvertingServices.HttpClients.Implementations;
 using MiniBank.Web.Middlewares;
 
 namespace MiniBank.Web
@@ -43,7 +39,7 @@ namespace MiniBank.Web
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MiniBank.Web v1"));
             }
 
-            app.UseMiddleware<ValidationExceptionMiddleware>();
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

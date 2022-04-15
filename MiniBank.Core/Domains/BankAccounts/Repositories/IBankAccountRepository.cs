@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MiniBank.Core.Domains.BankAccounts.Repositories
 {
     public interface IBankAccountRepository
     {
-        void Add(BankAccount bankAccount);
+        Task Add(BankAccount bankAccount, CancellationToken cancellationToken);
 
-        BankAccount GetById(Guid id);
+        Task<BankAccount> GetById(Guid id, CancellationToken cancellationToken);
 
-        IEnumerable<BankAccount> GetAll();
+        Task<IEnumerable<BankAccount>> GetAll(CancellationToken cancellationToken);
 
-        void Update(BankAccount bankAccount);
+        Task Update(BankAccount bankAccount, CancellationToken cancellationToken);
 
-        void UpdateAccountMoney(Guid id, double amountOfMoney);
+        Task UpdateAccountMoney(Guid id, double amountOfMoney, CancellationToken cancellationToken);
 
-        void DeleteById(Guid id);
+        Task DeleteById(Guid id, CancellationToken cancellationToken);
 
-        bool ExistsForUser(Guid accountId);
+        Task<bool> ExistsForUser(Guid accountId, CancellationToken cancellationToken);
+
+        Task<bool> IsOpened(Guid accountId, CancellationToken cancellationToken);
     }
 }

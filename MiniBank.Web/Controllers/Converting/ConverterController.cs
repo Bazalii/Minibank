@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
 using MiniBank.Core.Enums;
 
@@ -17,9 +18,11 @@ namespace MiniBank.Web.Controllers.Converting
 
         [HttpGet]
         [Route("/convert")]
-        public double ConvertOneCurrencyToAnother(int amount, Currencies fromCurrency, Currencies toCurrency)
+        public async Task<double> ConvertOneCurrencyToAnother(int amount, Currencies fromCurrency,
+            Currencies toCurrency)
         {
-            return _currencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
+            var convertedSum = await _currencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
+            return convertedSum;
         }
     }
 }

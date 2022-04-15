@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MiniBank.Core.Domains.Users.Repositories
 {
     public interface IUserRepository
     {
-        void Add(User user);
+        Task Add(User user, CancellationToken cancellationToken);
 
-        User GetById(Guid id);
+        Task<User> GetById(Guid id, CancellationToken cancellationToken);
 
-        IEnumerable<User> GetAll();
+        Task<IEnumerable<User>> GetAll(CancellationToken cancellationToken);
 
-        void Update(User user);
+        Task Update(User user, CancellationToken cancellationToken);
 
-        void DeleteById(Guid id);
+        Task DeleteById(Guid id, CancellationToken cancellationToken);
 
-        bool Exists(Guid id);
+        Task<bool> Exists(Guid id, CancellationToken cancellationToken);
+
+        Task<bool> IsLoginExists(string login, CancellationToken cancellationToken);
     }
 }

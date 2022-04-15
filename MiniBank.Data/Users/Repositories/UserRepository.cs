@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.Users;
 using MiniBank.Core.Domains.Users.Repositories;
 using MiniBank.Data.Exceptions;
@@ -9,21 +12,29 @@ namespace MiniBank.Data.Users.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly List<UserDbModel> _users = new();
+        private readonly MiniBankContext _context;
 
-        public void Add(User user)
+        public UserRepository(MiniBankContext context)
         {
-            _users.Add(new UserDbModel
+            _context = context;
+        }
+
+        public async Task Add(User user, CancellationToken cancellationToken)
+        {
+            await _context.Users.AddAsync(new UserDbModel
             {
                 Id = user.Id,
                 Login = user.Login,
                 Email = user.Email
-            });
+            }, cancellationToken);
         }
 
-        public User GetById(Guid id)
+        public async Task<User> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == id);
+            var dbModel = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(currentUser => currentUser.Id == id, cancellationToken);
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {id} is not found!");
@@ -37,19 +48,23 @@ namespace MiniBank.Data.Users.Repositories
             };
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAll(CancellationToken cancellationToken)
         {
-            return _users.Select(user => new User
-            {
-                Id = user.Id,
-                Login = user.Login,
-                Email = user.Email
-            });
+            return await _context.Users
+                .AsNoTracking()
+                .Select(user => new User
+                {
+                    Id = user.Id,
+                    Login = user.Login,
+                    Email = user.Email
+                }).ToListAsync(cancellationToken);
         }
 
-        public void Update(User user)
+        public async Task Update(User user, CancellationToken cancellationToken)
         {
-            var dbModel = _users.FirstOrDefault(currentUser => currentUser.Id == user.Id);
+            var dbModel =
+                await _context.Users.FirstOrDefaultAsync(currentUser => currentUser.Id == user.Id, cancellationToken);
+
             if (dbModel == null)
             {
                 throw new ObjectNotFoundException($"User with id: {user.Id} is not found!");
@@ -59,21 +74,26 @@ namespace MiniBank.Data.Users.Repositories
             dbModel.Email = user.Email;
         }
 
-        public void DeleteById(Guid id)
+        public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            _users.RemoveAt(GetIndex(id));
+            var dbModel = await _context.Users.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+
+            if (dbModel == null)
+            {
+                throw new ObjectNotFoundException($"User with id: {id} is not found!");
+            }
+
+            _context.Users.Remove(dbModel);
         }
 
-        public bool Exists(Guid id)
+        public Task<bool> Exists(Guid id, CancellationToken cancellationToken)
         {
-            var index = GetIndex(id);
-            return index != -1;
+            return _context.Users.AnyAsync(user => user.Id == id, cancellationToken);
         }
 
-        private int GetIndex(Guid id)
+        public Task<bool> IsLoginExists(string login, CancellationToken cancellationToken)
         {
-            var index = _users.FindIndex(currentUser => currentUser.Id == id);
-            return index;
+            return _context.Users.AnyAsync(user => user.Login == login, cancellationToken);
         }
     }
 }

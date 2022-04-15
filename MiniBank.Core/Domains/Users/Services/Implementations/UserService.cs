@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentValidation;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
-using MiniBank.Core.Exceptions;
+using ValidationException = MiniBank.Core.Exceptions.ValidationException;
 
 namespace MiniBank.Core.Domains.Users.Services.Implementations
 {
@@ -12,45 +15,65 @@ namespace MiniBank.Core.Domains.Users.Services.Implementations
 
         private readonly IBankAccountRepository _bankAccountRepository;
 
-        public UserService(IUserRepository userRepository, IBankAccountRepository bankAccountRepository)
+        private readonly IUnitOfWork _unitOfWork;
+
+        private readonly IValidator<User> _userValidator;
+
+        public UserService(IUserRepository userRepository, IBankAccountRepository bankAccountRepository,
+            IUnitOfWork unitOfWork, IValidator<User> userValidator)
         {
             _userRepository = userRepository;
             _bankAccountRepository = bankAccountRepository;
+            _unitOfWork = unitOfWork;
+            _userValidator = userValidator;
         }
 
-        public void Add(UserCreationModel model)
+        public async Task Add(UserCreationModel model, CancellationToken cancellationToken)
         {
-            _userRepository.Add(new User
+            var user = new User
             {
                 Id = Guid.NewGuid(),
                 Login = model.Login,
                 Email = model.Email
-            });
+            };
+            
+            await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
+
+            await _userRepository.Add(user, cancellationToken);
+
+            await _unitOfWork.SaveChanges(cancellationToken);
         }
 
-        public User GetById(Guid id)
+        public Task<User> GetById(Guid id, CancellationToken cancellationToken)
         {
-            return _userRepository.GetById(id);
+            return _userRepository.GetById(id, cancellationToken);
         }
 
-        public IEnumerable<User> GetAll()
+        public Task<IEnumerable<User>> GetAll(CancellationToken cancellationToken)
         {
-            return _userRepository.GetAll();
+            return _userRepository.GetAll(cancellationToken);
         }
 
-        public void Update(User user)
+        public async Task Update(User user, CancellationToken cancellationToken)
         {
-            _userRepository.Update(user);
+            await _userValidator.ValidateAndThrowAsync(user, cancellationToken);
+
+            await _userRepository.Update(user, cancellationToken);
+
+            await _unitOfWork.SaveChanges(cancellationToken);
         }
 
-        public void DeleteById(Guid id)
+        public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            if (_bankAccountRepository.ExistsForUser(id))
+            var check = await _bankAccountRepository.ExistsForUser(id, cancellationToken);
+
+            if (check)
             {
                 throw new ValidationException($"User with id: {id} has connected accounts!");
             }
 
-            _userRepository.DeleteById(id);
+            await _userRepository.DeleteById(id, cancellationToken);
+            await _unitOfWork.SaveChanges(cancellationToken);
         }
     }
 }
