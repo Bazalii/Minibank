@@ -21,11 +21,11 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly IValidator<BankAccountCreationModel> _bankAccountValidator;
+        private readonly IValidator<BankAccount> _bankAccountValidator;
 
         public BankAccountService(IBankAccountRepository bankAccountRepository, ICurrencyConverter currencyConverter,
             ITransactionRepository transactionRepository, IUnitOfWork unitOfWork,
-            IValidator<BankAccountCreationModel> bankAccountValidator)
+            IValidator<BankAccount> bankAccountValidator)
         {
             _bankAccountRepository = bankAccountRepository;
             _currencyConverter = currencyConverter;
@@ -36,9 +36,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public async Task Add(BankAccountCreationModel model, CancellationToken cancellationToken)
         {
-            await _bankAccountValidator.ValidateAndThrowAsync(model, cancellationToken);
-
-            await _bankAccountRepository.Add(new BankAccount
+            var bankAccount = new BankAccount
             {
                 Id = Guid.NewGuid(),
                 UserId = model.UserId,
@@ -46,7 +44,11 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 CurrencyCode = model.CurrencyCode,
                 IsOpened = true,
                 OpenDate = DateTime.UtcNow
-            }, cancellationToken);
+            };
+            
+            await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
+
+            await _bankAccountRepository.Add(bankAccount, cancellationToken);
 
             await _unitOfWork.SaveChanges(cancellationToken);
         }
@@ -63,11 +65,14 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public async Task Update(BankAccount bankAccount, CancellationToken cancellationToken)
         {
+            await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
+            
             await _bankAccountRepository.Update(bankAccount, cancellationToken);
+            
             await _unitOfWork.SaveChanges(cancellationToken);
         }
 
-        public async Task UpdateMoneyOnAccount(Guid id, double amountOfMoney, CancellationToken cancellationToken)
+        public async Task UpdateAccountMoney(Guid id, double amountOfMoney, CancellationToken cancellationToken)
         {
             await _bankAccountRepository.UpdateAccountMoney(id, amountOfMoney, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);

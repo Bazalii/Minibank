@@ -15,7 +15,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services
 
         Task Update(BankAccount bankAccount, CancellationToken cancellationToken);
 
-        Task UpdateMoneyOnAccount(Guid id, double amountOfMoney, CancellationToken cancellationToken);
+        Task UpdateAccountMoney(Guid id, double amountOfMoney, CancellationToken cancellationToken);
 
         Task CloseAccountById(Guid id, CancellationToken cancellationToken);
 
