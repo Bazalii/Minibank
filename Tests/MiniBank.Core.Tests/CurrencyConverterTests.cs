@@ -49,6 +49,19 @@ public class CurrencyConverterTests
     {
         var result = await _mockCurrencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
 
+        if (fromCurrency == toCurrency)
+        {
+            _mockExchangeRateProvider
+                .Verify(provider => provider.GetCourse(fromCurrency.ToString()), Times.Exactly(2));
+        }
+        else
+        {
+            _mockExchangeRateProvider
+                .Verify(provider => provider.GetCourse(fromCurrency.ToString()), Times.Once);
+            _mockExchangeRateProvider
+                .Verify(provider => provider.GetCourse(toCurrency.ToString()), Times.Once);
+        }
+
         Assert.Equal(expectedResult, result);
     }
 }
