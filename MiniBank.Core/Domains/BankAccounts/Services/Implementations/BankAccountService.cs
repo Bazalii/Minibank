@@ -45,7 +45,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 IsOpened = true,
                 OpenDate = DateTime.UtcNow
             };
-            
+
             await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
 
             await _bankAccountRepository.Add(bankAccount, cancellationToken);
@@ -66,9 +66,9 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
         public async Task Update(BankAccount bankAccount, CancellationToken cancellationToken)
         {
             await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
-            
+
             await _bankAccountRepository.Update(bankAccount, cancellationToken);
-            
+
             await _unitOfWork.SaveChanges(cancellationToken);
         }
 
@@ -123,11 +123,14 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             {
                 throw new ValidationException("Not enough money to transfer!");
             }
-            
-            await _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId,
-                withdrawalAccount.AmountOfMoney - amount, cancellationToken);
+
+            var finalWithdrawalAccountAmount = Math.Round(withdrawalAccount.AmountOfMoney - amount, 2);
+
+            await _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId, finalWithdrawalAccountAmount,
+                cancellationToken);
 
             var finalAmount = amount;
+
             if (withdrawalAccount.CurrencyCode != replenishmentAccount.CurrencyCode)
             {
                 finalAmount = await _currencyConverter.ConvertCurrency(finalAmount, withdrawalAccount.CurrencyCode,
@@ -137,9 +140,10 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             var commission = await CalculateCommission(finalAmount, withdrawalAccountId, replenishmentAccountId,
                 cancellationToken);
             finalAmount -= commission;
+            var finalReplenishmentAccountAmount = Math.Round(replenishmentAccount.AmountOfMoney + finalAmount, 2);
 
-            await _bankAccountRepository.UpdateAccountMoney(replenishmentAccountId,
-                replenishmentAccount.AmountOfMoney + finalAmount, cancellationToken);
+            await _bankAccountRepository.UpdateAccountMoney(replenishmentAccountId, finalReplenishmentAccountAmount,
+                cancellationToken);
 
             await _transactionRepository.Add(new Transaction
             {
@@ -147,7 +151,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 WithdrawalAccount = withdrawalAccountId,
                 ReplenishmentAccount = replenishmentAccountId,
                 AmountOfMoney = finalAmount
-            });
+            }, cancellationToken);
 
             await _unitOfWork.SaveChanges(cancellationToken);
         }
@@ -161,7 +165,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 throw new ValidationException(
                     $"Account to delete with id: {id} should be closed before deletion!");
             }
-            
+
             await _bankAccountRepository.DeleteById(id, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
         }
