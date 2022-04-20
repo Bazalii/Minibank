@@ -24,8 +24,9 @@ public class BankAccountValidatorTests
     }
 
     [Fact]
-    public async Task ValidateAndThrowAsync_AccountNegativeAmountOfMoney_ThrowException()
+    public async Task ValidateAndThrowAsync_AccountWithNegativeAmountOfMoney_ThrowException()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -36,18 +37,20 @@ public class BankAccountValidatorTests
 
         _mockUserRepository
             .Setup(repository => repository.Exists(userId, default))
-            .ReturnsAsync(false);
+            .ReturnsAsync(true);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _bankAccountValidator.ValidateAndThrowAsync(bankAccount));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _bankAccountValidator.ValidateAndThrowAsync(bankAccount));
 
+        // ASSERT
         Assert.Contains("AmountOfMoney: should be greater than 0!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndThrowAsync_AccountWithUserThatNotExists_ThrowException()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -60,16 +63,18 @@ public class BankAccountValidatorTests
             .Setup(repository => repository.Exists(userId, default))
             .ReturnsAsync(false);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _bankAccountValidator.ValidateAndThrowAsync(bankAccount));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _bankAccountValidator.ValidateAndThrowAsync(bankAccount));
 
+        // ASSERT
         Assert.Contains("UserId: user with entered Id doesn't exist!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndTrowAsync_SuccessPath_UserIsValidated()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -83,11 +88,11 @@ public class BankAccountValidatorTests
             .Setup(repository => repository.Exists(userId, default))
             .ReturnsAsync(true);
 
+        // ACT
         await _bankAccountValidator.ValidateAndThrowAsync(bankAccount);
 
+        // ASSERT
         _mockUserRepository
-            .Verify(
-                repository => repository.Exists(bankAccount.UserId, default),
-                Times.Once());
+            .Verify(repository => repository.Exists(bankAccount.UserId, default), Times.Once());
     }
 }

@@ -17,15 +17,6 @@ public class CurrencyConverterTests
     public CurrencyConverterTests()
     {
         _mockExchangeRateProvider = new Mock<IExchangeRateProvider>();
-        _mockExchangeRateProvider
-            .Setup(provider => provider.GetCourse("RUB"))
-            .ReturnsAsync(1);
-        _mockExchangeRateProvider
-            .Setup(provider => provider.GetCourse("EUR"))
-            .ReturnsAsync(80);
-        _mockExchangeRateProvider
-            .Setup(provider => provider.GetCourse("USD"))
-            .ReturnsAsync(70);
 
         _mockCurrencyConverter = new CurrencyConverter(_mockExchangeRateProvider.Object);
     }
@@ -33,9 +24,19 @@ public class CurrencyConverterTests
     [Fact]
     public async Task ConvertCurrency_AmountIsNegative_ThrowException()
     {
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            _mockCurrencyConverter.ConvertCurrency(-1, Currencies.EUR, Currencies.RUB));
+        // ARRANGE
+        _mockExchangeRateProvider
+            .Setup(provider => provider.GetCourse("RUB"))
+            .ReturnsAsync(1);
+        _mockExchangeRateProvider
+            .Setup(provider => provider.GetCourse("EUR"))
+            .ReturnsAsync(80);
 
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _mockCurrencyConverter.ConvertCurrency(-1, Currencies.EUR, Currencies.RUB));
+
+        // ASSERT
         Assert.Contains("The amount of money cannot be negative!", exception.Message);
     }
 
@@ -47,8 +48,21 @@ public class CurrencyConverterTests
     public async Task ConvertCurrency_SuccessPath_ReturnsConvertedResultGetCourseIsCalledTwice(double amount,
         Currencies fromCurrency, Currencies toCurrency, double expectedResult)
     {
+        // ARRANGE
+        _mockExchangeRateProvider
+            .Setup(provider => provider.GetCourse("RUB"))
+            .ReturnsAsync(1);
+        _mockExchangeRateProvider
+            .Setup(provider => provider.GetCourse("EUR"))
+            .ReturnsAsync(80);
+        _mockExchangeRateProvider
+            .Setup(provider => provider.GetCourse("USD"))
+            .ReturnsAsync(70);
+
+        // ACT
         var result = await _mockCurrencyConverter.ConvertCurrency(amount, fromCurrency, toCurrency);
 
+        // ASSERT
         if (fromCurrency == toCurrency)
         {
             _mockExchangeRateProvider

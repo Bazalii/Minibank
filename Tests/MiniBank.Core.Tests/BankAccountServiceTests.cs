@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using MiniBank.Core.Domains.BankAccounts;
@@ -45,6 +46,7 @@ public class BankAccountServiceTests
     [Fact]
     public async Task Add_SuccessPath_AccountIsValidatedAddInBankAccountRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         var bankAccountCreationModel = new BankAccountCreationModel
@@ -52,11 +54,12 @@ public class BankAccountServiceTests
             UserId = userId
         };
 
+        // ACT
         await _bankAccountService.Add(bankAccountCreationModel, default);
 
+        // ASSERT
         _mockBankAccountValidator
-            .Verify(
-                validator => validator.ValidateAsync(It.IsAny<ValidationContext<BankAccount>>(), default),
+            .Verify(validator => validator.ValidateAsync(It.IsAny<ValidationContext<BankAccount>>(), default),
                 Times.Once());
         _mockBankAccountRepository
             .Verify(repository => repository.Add(It.Is<BankAccount>(account => account.UserId == userId), default),
@@ -68,21 +71,25 @@ public class BankAccountServiceTests
     [Fact]
     public async Task GetById_BankAccountNotExists_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(accountId, default))
             .ThrowsAsync(new ObjectNotFoundException($"Account with id: {accountId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() => _bankAccountService.GetById(accountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _bankAccountService.GetById(accountId, default));
 
+        // ASSERT
         Assert.Equal($"Account with id: {accountId} is not found!", exception.Message);
     }
 
     [Fact]
     public async Task GetById_SuccessPath_GetByIdInBankAccountRepositoryIsCalledReturnsCorrespondingBankAccount()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -94,8 +101,10 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(accountId, default))
             .ReturnsAsync(bankAccount);
 
+        // ACT
         var result = await _bankAccountService.GetById(accountId, default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(repository => repository.GetById(accountId, default), Times.Once());
 
@@ -107,21 +116,26 @@ public class BankAccountServiceTests
     public async Task GetAll_SuccessPath_GetAllInBankAccountRepositoryIsCalledReturnsIEnumerableOfBankAccounts(
         IEnumerable<BankAccount> expectedResult)
     {
+        // ARRANGE
+        var enumerable = expectedResult.ToList();
         _mockBankAccountRepository
             .Setup(repository => repository.GetAll(default))
-            .ReturnsAsync(expectedResult);
+            .ReturnsAsync(enumerable);
 
+        // ACT
         var bankAccounts = await _bankAccountService.GetAll(default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(repository => repository.GetAll(default), Times.Once());
 
-        Assert.Equal(expectedResult, bankAccounts);
+        Assert.Equal(enumerable, bankAccounts);
     }
 
     [Fact]
     public async Task Update_BankAccountNotExists_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -133,10 +147,11 @@ public class BankAccountServiceTests
             .Setup(repository => repository.Update(bankAccount, default))
             .ThrowsAsync(new ObjectNotFoundException($"Account with id: {accountId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _bankAccountService.Update(bankAccount, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _bankAccountService.Update(bankAccount, default));
 
+        // ASSERT
         Assert.Equal($"Account with id: {accountId} is not found!", exception.Message);
     }
 
@@ -144,6 +159,7 @@ public class BankAccountServiceTests
     public async Task
         Update_SuccessPath_AccountIsValidatedUpdateInBankAccountRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -151,11 +167,12 @@ public class BankAccountServiceTests
             Id = accountId
         };
 
+        // ACT
         await _bankAccountService.Update(bankAccount, default);
 
+        // ASSERT
         _mockBankAccountValidator
-            .Verify(
-                validator => validator.ValidateAsync(It.IsAny<ValidationContext<BankAccount>>(), default),
+            .Verify(validator => validator.ValidateAsync(It.IsAny<ValidationContext<BankAccount>>(), default),
                 Times.Once());
         _mockBankAccountRepository
             .Verify(repository => repository.Update(bankAccount, default), Times.Once());
@@ -166,16 +183,18 @@ public class BankAccountServiceTests
     [Fact]
     public async Task UpdateAccountMoney_BankAccountNotExists_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.UpdateAccountMoney(accountId, 100, default))
             .ThrowsAsync(new ObjectNotFoundException($"Account with id: {accountId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _bankAccountService.UpdateAccountMoney(accountId, 100, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _bankAccountService.UpdateAccountMoney(accountId, 100, default));
 
+        // ASSERT
         Assert.Equal($"Account with id: {accountId} is not found!", exception.Message);
     }
 
@@ -183,10 +202,13 @@ public class BankAccountServiceTests
     public async Task
         UpdateAccountMoney_SuccessPath_UpdateAccountMoneyInBankAccountRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
+        // ACT
         await _bankAccountService.UpdateAccountMoney(accountId, 100, default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(repository => repository.UpdateAccountMoney(accountId, 100, default), Times.Once());
         _mockUnitOfWork
@@ -196,6 +218,7 @@ public class BankAccountServiceTests
     [Fact]
     public async Task CloseAccountById_ThereIsMoneyOnBankAccount_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -208,10 +231,11 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(accountId, default))
             .ReturnsAsync(bankAccount);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(
-                () => _bankAccountService.CloseAccountById(accountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _bankAccountService.CloseAccountById(accountId, default));
 
+        // ASSERT
         Assert.Equal($"Amount of money on account with id: {accountId} that you want to close should be 0!",
             exception.Message);
     }
@@ -220,6 +244,7 @@ public class BankAccountServiceTests
     public async Task
         CloseAccountById_SuccessPath_GetByIdAndUpdateInBankAccountRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -232,8 +257,10 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(accountId, default))
             .ReturnsAsync(bankAccount);
 
+        // ACT
         await _bankAccountService.CloseAccountById(accountId, default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(repository => repository.GetById(accountId, default), Times.Once);
         _mockBankAccountRepository
@@ -245,6 +272,7 @@ public class BankAccountServiceTests
     [Fact]
     public async Task CalculateCommission_WithdrawalAccountNotExists_ThrowException()
     {
+        // ARRANGE
         var withdrawalAccountId = Guid.NewGuid();
 
         var replenishmentAccountId = Guid.NewGuid();
@@ -255,16 +283,19 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(withdrawalAccountId, default))
             .ThrowsAsync(new ObjectNotFoundException($"Account with id: {withdrawalAccountId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _bankAccountService.CalculateCommission(amount, withdrawalAccountId, replenishmentAccountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _bankAccountService.CalculateCommission(amount, withdrawalAccountId, replenishmentAccountId,
+                default));
 
+        // ASSERT
         Assert.Equal($"Account with id: {withdrawalAccountId} is not found!", exception.Message);
     }
 
     [Fact]
     public async Task CalculateCommission_ReplenishmentAccountNotExists_ThrowException()
     {
+        // ARRANGE
         var withdrawalAccountId = Guid.NewGuid();
 
         var replenishmentAccountId = Guid.NewGuid();
@@ -275,10 +306,12 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(replenishmentAccountId, default))
             .ThrowsAsync(new ObjectNotFoundException($"Account with id: {replenishmentAccountId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _bankAccountService.CalculateCommission(amount, withdrawalAccountId, replenishmentAccountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _bankAccountService.CalculateCommission(amount, withdrawalAccountId, replenishmentAccountId,
+                default));
 
+        // ASSERT
         Assert.Equal($"Account with id: {replenishmentAccountId} is not found!", exception.Message);
     }
 
@@ -287,6 +320,7 @@ public class BankAccountServiceTests
     public async Task CalculateCommission_SuccessPath_CommissionIsCalculated(double amount,
         BankAccount withdrawalAccount, BankAccount replenishmentAccount, double expectedCommission)
     {
+        // ARRANGE
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(withdrawalAccount.Id, default))
             .ReturnsAsync(withdrawalAccount);
@@ -294,10 +328,12 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(replenishmentAccount.Id, default))
             .ReturnsAsync(replenishmentAccount);
 
+        // ACT
         var commission =
             await _bankAccountService.CalculateCommission(amount, withdrawalAccount.Id, replenishmentAccount.Id,
                 default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(repository => repository.GetById(withdrawalAccount.Id, default), Times.Once);
         _mockBankAccountRepository
@@ -310,6 +346,7 @@ public class BankAccountServiceTests
     [Fact]
     public async Task TransferMoney_AccountsAreTheSame_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         var bankAccount = new BankAccount
@@ -321,16 +358,18 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(accountId, default))
             .ReturnsAsync(bankAccount);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _bankAccountService.TransferMoney(100, accountId, accountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _bankAccountService.TransferMoney(100, accountId, accountId, default));
 
+        // ASSERT
         Assert.Equal("Money can be transferred only between different accounts!", exception.Message);
     }
 
     [Fact]
     public async Task TransferMoney_NotEnoughMoneyOnWithdrawalAccount_ThrowException()
     {
+        // ARRANGE
         var withdrawalAccountId = Guid.NewGuid();
 
         var replenishmentAccountId = Guid.NewGuid();
@@ -350,15 +389,15 @@ public class BankAccountServiceTests
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(withdrawalAccountId, default))
             .ReturnsAsync(withdrawalAccount);
-
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(replenishmentAccountId, default))
             .ReturnsAsync(replenishmentAccount);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _bankAccountService.TransferMoney(100, withdrawalAccountId, replenishmentAccountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _bankAccountService.TransferMoney(100, withdrawalAccountId, replenishmentAccountId, default));
 
+        // ASSERT
         Assert.Equal("Not enough money to transfer!", exception.Message);
     }
 
@@ -367,14 +406,15 @@ public class BankAccountServiceTests
     public async Task TransferMoney_SuccessPath_MoneyIsWithdrawnFromWithdrawalAccountReplenishmentAccountIsReplenished(
         BankAccount withdrawalAccount, BankAccount replenishmentAccount, double amount)
     {
+        // ARRANGE
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(withdrawalAccount.Id, default))
             .ReturnsAsync(withdrawalAccount);
-
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(replenishmentAccount.Id, default))
             .ReturnsAsync(replenishmentAccount);
 
+        // ACT 
         var commission =
             await _bankAccountService.CalculateCommission(amount, withdrawalAccount.Id, replenishmentAccount.Id,
                 default);
@@ -383,6 +423,7 @@ public class BankAccountServiceTests
 
         await _bankAccountService.TransferMoney(amount, withdrawalAccount.Id, replenishmentAccount.Id, default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(
                 repository =>
@@ -409,46 +450,53 @@ public class BankAccountServiceTests
     [Fact]
     public async Task DeleteById_AccountNotExists_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.DeleteById(accountId, default))
             .ThrowsAsync(new ObjectNotFoundException($"Account with id: {accountId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _bankAccountService.DeleteById(accountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _bankAccountService.DeleteById(accountId, default));
 
+        // ASSERT
         Assert.Equal($"Account with id: {accountId} is not found!", exception.Message);
     }
 
     [Fact]
     public async Task DeleteById_AccountIsNotClosed_ThrowException()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.IsOpened(accountId, default))
             .ReturnsAsync(true);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _bankAccountService.DeleteById(accountId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _bankAccountService.DeleteById(accountId, default));
 
+        // ASSERT
         Assert.Equal($"Account to delete with id: {accountId} should be closed before deletion!", exception.Message);
     }
 
     [Fact]
     public async Task DeleteById_SuccessPath_DeleteByIdInBankAccountRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var accountId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.IsOpened(accountId, default))
             .ReturnsAsync(false);
 
+        // ACT
         await _bankAccountService.DeleteById(accountId, default);
 
+        // ASSERT
         _mockBankAccountRepository
             .Verify(repository => repository.DeleteById(accountId, default), Times.Once);
         _mockUnitOfWork

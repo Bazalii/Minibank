@@ -40,6 +40,7 @@ public class UserServiceTests
     [Fact]
     public async Task Add_SuccessPath_AccountIsValidatedAddInUserRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         const string login = "Example";
 
         var userCreationModel = new UserCreationModel
@@ -47,8 +48,10 @@ public class UserServiceTests
             Login = login
         };
 
+        // ACT
         await _userService.Add(userCreationModel, default);
 
+        // ASSERT
         _mockUserValidator
             .Verify(
                 validator => validator.ValidateAsync(It.IsAny<ValidationContext<User>>(), default),
@@ -63,16 +66,44 @@ public class UserServiceTests
     [Fact]
     public async Task GetById_UserNotExists_ThrowException()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         _mockUserRepository
             .Setup(repository => repository.GetById(userId, default))
             .ThrowsAsync(new ObjectNotFoundException($"User with id: {userId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() => _userService.GetById(userId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _userService.GetById(userId, default));
 
+        // ASSERT
         Assert.Equal($"User with id: {userId} is not found!", exception.Message);
+    }
+
+    [Fact]
+    public async Task GetById_SuccessPath_GetByIdInUserRepositoryIsCalledReturnsCorrespondingUser()
+    {
+        // ARRANGE
+        var userId = Guid.NewGuid();
+
+        var user = new User
+        {
+            Id = userId
+        };
+
+        _mockUserRepository
+            .Setup(repository => repository.GetById(userId, default))
+            .ReturnsAsync(user);
+
+        // ACT
+        var result = await _userService.GetById(userId, default);
+
+        // ASSERT
+        _mockUserRepository
+            .Verify(repository => repository.GetById(userId, default), Times.Once());
+
+        Assert.Equal(user, result);
     }
 
     [Theory]
@@ -80,12 +111,15 @@ public class UserServiceTests
     public async Task GetAll_SuccessPath_GetAllInUserRepositoryIsCalledReturnsIEnumerableOfUsers(
         params User[] expectedResult)
     {
+        // ARRANGE
         _mockUserRepository
             .Setup(repository => repository.GetAll(default))
             .ReturnsAsync(expectedResult);
 
+        // ACT
         var users = await _userService.GetAll(default);
 
+        // ASSERT
         _mockUserRepository
             .Verify(repository => repository.GetAll(default), Times.Once());
 
@@ -95,6 +129,7 @@ public class UserServiceTests
     [Fact]
     public async Task Update_UserNotExists_ThrowException()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         var user = new User
@@ -106,16 +141,18 @@ public class UserServiceTests
             .Setup(repository => repository.Update(user, default))
             .ThrowsAsync(new ObjectNotFoundException($"User with id: {userId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _userService.Update(user, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _userService.Update(user, default));
 
+        // ASSERT
         Assert.Equal($"User with id: {userId} is not found!", exception.Message);
     }
 
     [Fact]
     public async Task Update_SuccessPath_UserIsValidatedUpdateInUserRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         var user = new User
@@ -123,15 +160,15 @@ public class UserServiceTests
             Id = userId
         };
 
+        // ACT
         await _userService.Update(user, default);
 
+        // ASSERT
         _mockUserValidator
-            .Verify(
-                validator => validator.ValidateAsync(It.IsAny<ValidationContext<User>>(), default),
+            .Verify(validator => validator.ValidateAsync(It.IsAny<ValidationContext<User>>(), default),
                 Times.Once());
         _mockUserRepository
-            .Verify(repository => repository.Update(user, default),
-                Times.Once());
+            .Verify(repository => repository.Update(user, default), Times.Once());
         _mockUnitOfWork
             .Verify(unitOfWork => unitOfWork.SaveChanges(default), Times.Once());
     }
@@ -139,46 +176,53 @@ public class UserServiceTests
     [Fact]
     public async Task DeleteById_UserNotExists_ThrowException()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         _mockUserRepository
             .Setup(repository => repository.DeleteById(userId, default))
             .ThrowsAsync(new ObjectNotFoundException($"User with id: {userId} is not found!"));
 
-        var exception =
-            await Assert.ThrowsAsync<ObjectNotFoundException>(() =>
-                _userService.DeleteById(userId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ObjectNotFoundException>(async () =>
+            await _userService.DeleteById(userId, default));
 
+        // ASSERT
         Assert.Equal($"User with id: {userId} is not found!", exception.Message);
     }
 
     [Fact]
     public async Task DeleteById_UserHasConnectedAccounts_ThrowException()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.ExistsForUser(userId, default))
             .ReturnsAsync(true);
 
-        var exception =
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _userService.DeleteById(userId, default));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _userService.DeleteById(userId, default));
 
+        // ASSERT
         Assert.Equal($"User with id: {userId} has connected accounts!", exception.Message);
     }
 
     [Fact]
     public async Task DeleteById_SuccessPath_DeleteByIdInUserRepositoryAndSaveChangesInUnitOfWorkAreCalled()
     {
+        // ARRANGE
         var userId = Guid.NewGuid();
 
         _mockBankAccountRepository
             .Setup(repository => repository.ExistsForUser(userId, default))
             .ReturnsAsync(false);
 
+        // ACT
         await _userService.DeleteById(userId, default);
 
+        // ASSERT
         _mockUserRepository
             .Verify(repository => repository.DeleteById(userId, default), Times.Once);
         _mockUnitOfWork

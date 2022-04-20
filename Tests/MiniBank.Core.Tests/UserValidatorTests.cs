@@ -25,6 +25,7 @@ public class UserValidatorTests
     [Fact]
     public async Task ValidateAndTrowAsync_UserWithEmptyLogin_ThrowException()
     {
+        // ARRANGE
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -32,15 +33,18 @@ public class UserValidatorTests
             Email = "example@example.com"
         };
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            _userValidator.ValidateAndThrowAsync(user));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _userValidator.ValidateAndThrowAsync(user));
 
+        // ASSERT
         Assert.Contains("Login: cannot be empty!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndTrowAsync_UserWithLoginThatContainsMoreThan20Symbols_ThrowException()
     {
+        // ARRANGE
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -48,15 +52,18 @@ public class UserValidatorTests
             Email = "example@example.com"
         };
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            _userValidator.ValidateAndThrowAsync(user));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _userValidator.ValidateAndThrowAsync(user));
 
+        // ASSERT
         Assert.Contains("Login.Length: cannot contain more than 20 symbols!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndTrowAsync_UserWithExistingLogin_ThrowException()
     {
+        // ARRANGE
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -68,15 +75,18 @@ public class UserValidatorTests
             .Setup(repository => repository.IsLoginExists("Example", default))
             .ReturnsAsync(true);
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            _userValidator.ValidateAndThrowAsync(user));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _userValidator.ValidateAndThrowAsync(user));
 
+        // ASSERT
         Assert.Contains("Login: should be unique!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndTrowAsync_UserWithEmptyEmail_ThrowException()
     {
+        // ARRANGE
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -84,15 +94,18 @@ public class UserValidatorTests
             Email = string.Empty
         };
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            _userValidator.ValidateAndThrowAsync(user));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _userValidator.ValidateAndThrowAsync(user));
 
+        // ASSERT
         Assert.Contains("Email: cannot be empty!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndTrowAsync_UserWithEmailThatNotContainsDog_ThrowException()
     {
+        // ARRANGE
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -100,15 +113,18 @@ public class UserValidatorTests
             Email = "example.com"
         };
 
-        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-            _userValidator.ValidateAndThrowAsync(user));
+        // ACT
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () =>
+            await _userValidator.ValidateAndThrowAsync(user));
 
+        // ASSERT
         Assert.Contains("Email: should contain @!", exception.Message);
     }
 
     [Fact]
     public async Task ValidateAndTrowAsync_SuccessPath_UserIsValidated()
     {
+        // ARRANGE
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -116,11 +132,11 @@ public class UserValidatorTests
             Email = "example@example.com"
         };
 
+        // ACT
         await _userValidator.ValidateAndThrowAsync(user);
 
+        // ASSERT
         _mockUserRepository
-            .Verify(
-                repository => repository.IsLoginExists(user.Login, default),
-                Times.Once());
+            .Verify(repository => repository.IsLoginExists(user.Login, default), Times.Once());
     }
 }
