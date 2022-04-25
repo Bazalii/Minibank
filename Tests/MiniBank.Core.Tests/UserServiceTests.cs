@@ -103,7 +103,7 @@ public class UserServiceTests
         _mockUserRepository
             .Verify(repository => repository.GetById(userId, default), Times.Once());
 
-        Assert.Equal(user, result);
+        Assert.Equal(user.Id, result.Id);
     }
 
     [Theory]

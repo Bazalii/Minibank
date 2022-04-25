@@ -250,7 +250,8 @@ public class BankAccountServiceTests
         var bankAccount = new BankAccount
         {
             Id = accountId,
-            AmountOfMoney = 0
+            AmountOfMoney = 0,
+            IsOpened = true
         };
 
         _mockBankAccountRepository
@@ -267,6 +268,8 @@ public class BankAccountServiceTests
             .Verify(repository => repository.Update(It.Is<BankAccount>(account => account.Id == accountId), default));
         _mockUnitOfWork
             .Verify(unitOfWork => unitOfWork.SaveChanges(default), Times.Once);
+
+        Assert.False(bankAccount.IsOpened);
     }
 
     [Fact]
@@ -551,6 +554,11 @@ public class BankAccountServiceTests
             {
                 new BankAccount { Id = Guid.NewGuid(), UserId = Guid.NewGuid(), AmountOfMoney = 100 },
                 new BankAccount { Id = Guid.NewGuid(), UserId = Guid.NewGuid(), AmountOfMoney = 30 }, 50.75
+            },
+            new object[]
+            {
+                new BankAccount { Id = Guid.NewGuid(), UserId = Guid.NewGuid(), AmountOfMoney = 50 },
+                new BankAccount { Id = Guid.NewGuid(), UserId = Guid.NewGuid(), AmountOfMoney = 30 }, 50
             },
             new object[]
             {
