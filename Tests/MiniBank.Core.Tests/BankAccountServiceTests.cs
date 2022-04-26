@@ -417,7 +417,7 @@ public class BankAccountServiceTests
             .Setup(repository => repository.GetById(replenishmentAccount.Id, default))
             .ReturnsAsync(replenishmentAccount);
 
-        // ACT 
+        // ACT
         var commission =
             await _bankAccountService.CalculateCommission(amount, withdrawalAccount.Id, replenishmentAccount.Id,
                 default);
@@ -444,7 +444,7 @@ public class BankAccountServiceTests
                         It.Is<Transaction>(transaction =>
                             transaction.WithdrawalAccount == withdrawalAccount.Id &&
                             transaction.ReplenishmentAccount == replenishmentAccount.Id &&
-                            transaction.AmountOfMoney == amount - commission),
+                            Math.Abs(transaction.AmountOfMoney - (amount - commission)) < 0.01),
                         default), Times.Once());
         _mockUnitOfWork
             .Verify(unitOfWork => unitOfWork.SaveChanges(default), Times.Once);
