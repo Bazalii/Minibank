@@ -8,6 +8,7 @@ using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.BankAccounts.Services;
 using MiniBank.Core.Domains.BankAccounts.Services.Implementations;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
+using MiniBank.Core.Domains.Providers;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Repositories;
 using MiniBank.Data.Exceptions;
@@ -27,6 +28,8 @@ public class BankAccountServiceTests
 
     private readonly Mock<ICurrencyConverter> _mockCurrencyConverter;
 
+    private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
+
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
 
     private readonly Mock<IValidator<BankAccount>> _mockBankAccountValidator;
@@ -35,12 +38,14 @@ public class BankAccountServiceTests
     {
         _mockBankAccountRepository = new Mock<IBankAccountRepository>();
         _mockTransactionRepository = new Mock<ITransactionRepository>();
+        _mockDateTimeProvider = new Mock<IDateTimeProvider>();
         _mockCurrencyConverter = new Mock<ICurrencyConverter>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockBankAccountValidator = new Mock<IValidator<BankAccount>>();
 
         _bankAccountService = new BankAccountService(_mockBankAccountRepository.Object, _mockCurrencyConverter.Object,
-            _mockTransactionRepository.Object, _mockUnitOfWork.Object, _mockBankAccountValidator.Object);
+            _mockTransactionRepository.Object, _mockUnitOfWork.Object, _mockBankAccountValidator.Object,
+            _mockDateTimeProvider.Object);
     }
 
     [Fact]
@@ -254,9 +259,14 @@ public class BankAccountServiceTests
             IsOpened = true
         };
 
+        var closeDate = new DateTime(2022, 1, 1);
+
         _mockBankAccountRepository
             .Setup(repository => repository.GetById(accountId, default))
             .ReturnsAsync(bankAccount);
+        _mockDateTimeProvider
+            .Setup(provider => provider.UtcNow)
+            .Returns(closeDate);
 
         // ACT
         await _bankAccountService.CloseAccountById(accountId, default);
@@ -270,6 +280,7 @@ public class BankAccountServiceTests
             .Verify(unitOfWork => unitOfWork.SaveChanges(default), Times.Once);
 
         Assert.False(bankAccount.IsOpened);
+        Assert.Equal(closeDate, bankAccount.CloseDate);
     }
 
     [Fact]
