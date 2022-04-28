@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
+using MiniBank.Core.Domains.Providers;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Repositories;
 using ValidationException = MiniBank.Core.Exceptions.ValidationException;
@@ -18,6 +19,8 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
         private readonly ITransactionRepository _transactionRepository;
 
         private readonly ICurrencyConverter _currencyConverter;
+        
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         private readonly IUnitOfWork _unitOfWork;
 
@@ -25,13 +28,14 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public BankAccountService(IBankAccountRepository bankAccountRepository, ICurrencyConverter currencyConverter,
             ITransactionRepository transactionRepository, IUnitOfWork unitOfWork,
-            IValidator<BankAccount> bankAccountValidator)
+            IValidator<BankAccount> bankAccountValidator, IDateTimeProvider dateTimeProvider)
         {
             _bankAccountRepository = bankAccountRepository;
             _currencyConverter = currencyConverter;
             _transactionRepository = transactionRepository;
             _unitOfWork = unitOfWork;
             _bankAccountValidator = bankAccountValidator;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task Add(BankAccountCreationModel model, CancellationToken cancellationToken)
@@ -43,7 +47,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 AmountOfMoney = model.AmountOfMoney,
                 CurrencyCode = model.CurrencyCode,
                 IsOpened = true,
-                OpenDate = DateTime.UtcNow
+                OpenDate = _dateTimeProvider.UtcNow
             };
 
             await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
@@ -89,7 +93,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             }
 
             model.IsOpened = false;
-            model.CloseDate = DateTime.UtcNow;
+            model.CloseDate = _dateTimeProvider.UtcNow;
 
             await _bankAccountRepository.Update(model, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
