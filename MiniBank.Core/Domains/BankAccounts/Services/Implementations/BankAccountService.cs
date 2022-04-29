@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MiniBank.Core.Domains.BankAccounts.Repositories;
 using MiniBank.Core.Domains.CurrencyConverting.Services;
+using MiniBank.Core.Domains.Providers;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Repositories;
 using ValidationException = MiniBank.Core.Exceptions.ValidationException;
@@ -18,35 +19,40 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
         private readonly ITransactionRepository _transactionRepository;
 
         private readonly ICurrencyConverter _currencyConverter;
+        
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly IValidator<BankAccountCreationModel> _bankAccountValidator;
+        private readonly IValidator<BankAccount> _bankAccountValidator;
 
         public BankAccountService(IBankAccountRepository bankAccountRepository, ICurrencyConverter currencyConverter,
             ITransactionRepository transactionRepository, IUnitOfWork unitOfWork,
-            IValidator<BankAccountCreationModel> bankAccountValidator)
+            IValidator<BankAccount> bankAccountValidator, IDateTimeProvider dateTimeProvider)
         {
             _bankAccountRepository = bankAccountRepository;
             _currencyConverter = currencyConverter;
             _transactionRepository = transactionRepository;
             _unitOfWork = unitOfWork;
             _bankAccountValidator = bankAccountValidator;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task Add(BankAccountCreationModel model, CancellationToken cancellationToken)
         {
-            await _bankAccountValidator.ValidateAndThrowAsync(model, cancellationToken);
-
-            await _bankAccountRepository.Add(new BankAccount
+            var bankAccount = new BankAccount
             {
                 Id = Guid.NewGuid(),
                 UserId = model.UserId,
                 AmountOfMoney = model.AmountOfMoney,
                 CurrencyCode = model.CurrencyCode,
                 IsOpened = true,
-                OpenDate = DateTime.UtcNow
-            }, cancellationToken);
+                OpenDate = _dateTimeProvider.UtcNow
+            };
+
+            await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
+
+            await _bankAccountRepository.Add(bankAccount, cancellationToken);
 
             await _unitOfWork.SaveChanges(cancellationToken);
         }
@@ -63,11 +69,14 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
 
         public async Task Update(BankAccount bankAccount, CancellationToken cancellationToken)
         {
+            await _bankAccountValidator.ValidateAndThrowAsync(bankAccount, cancellationToken);
+
             await _bankAccountRepository.Update(bankAccount, cancellationToken);
+
             await _unitOfWork.SaveChanges(cancellationToken);
         }
 
-        public async Task UpdateMoneyOnAccount(Guid id, double amountOfMoney, CancellationToken cancellationToken)
+        public async Task UpdateAccountMoney(Guid id, double amountOfMoney, CancellationToken cancellationToken)
         {
             await _bankAccountRepository.UpdateAccountMoney(id, amountOfMoney, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
@@ -84,7 +93,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             }
 
             model.IsOpened = false;
-            model.CloseDate = DateTime.UtcNow;
+            model.CloseDate = _dateTimeProvider.UtcNow;
 
             await _bankAccountRepository.Update(model, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
@@ -118,11 +127,14 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             {
                 throw new ValidationException("Not enough money to transfer!");
             }
-            
-            await _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId,
-                withdrawalAccount.AmountOfMoney - amount, cancellationToken);
+
+            var finalWithdrawalAccountAmount = Math.Round(withdrawalAccount.AmountOfMoney - amount, 2);
+
+            await _bankAccountRepository.UpdateAccountMoney(withdrawalAccountId, finalWithdrawalAccountAmount,
+                cancellationToken);
 
             var finalAmount = amount;
+
             if (withdrawalAccount.CurrencyCode != replenishmentAccount.CurrencyCode)
             {
                 finalAmount = await _currencyConverter.ConvertCurrency(finalAmount, withdrawalAccount.CurrencyCode,
@@ -132,9 +144,10 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
             var commission = await CalculateCommission(finalAmount, withdrawalAccountId, replenishmentAccountId,
                 cancellationToken);
             finalAmount -= commission;
+            var finalReplenishmentAccountAmount = Math.Round(replenishmentAccount.AmountOfMoney + finalAmount, 2);
 
-            await _bankAccountRepository.UpdateAccountMoney(replenishmentAccountId,
-                replenishmentAccount.AmountOfMoney + finalAmount, cancellationToken);
+            await _bankAccountRepository.UpdateAccountMoney(replenishmentAccountId, finalReplenishmentAccountAmount,
+                cancellationToken);
 
             await _transactionRepository.Add(new Transaction
             {
@@ -142,7 +155,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 WithdrawalAccount = withdrawalAccountId,
                 ReplenishmentAccount = replenishmentAccountId,
                 AmountOfMoney = finalAmount
-            });
+            }, cancellationToken);
 
             await _unitOfWork.SaveChanges(cancellationToken);
         }
@@ -156,7 +169,7 @@ namespace MiniBank.Core.Domains.BankAccounts.Services.Implementations
                 throw new ValidationException(
                     $"Account to delete with id: {id} should be closed before deletion!");
             }
-            
+
             await _bankAccountRepository.DeleteById(id, cancellationToken);
             await _unitOfWork.SaveChanges(cancellationToken);
         }

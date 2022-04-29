@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.Transactions;
@@ -17,7 +17,7 @@ namespace MiniBank.Data.Transactions.Repositories
             _context = context;
         }
 
-        public async Task Add(Transaction transaction)
+        public async Task Add(Transaction transaction, CancellationToken cancellationToken)
         {
             await _context.Transactions.AddAsync(new TransactionDbModel
             {
@@ -25,14 +25,14 @@ namespace MiniBank.Data.Transactions.Repositories
                 AmountOfMoney = transaction.AmountOfMoney,
                 WithdrawalAccount = transaction.WithdrawalAccount,
                 ReplenishmentAccount = transaction.ReplenishmentAccount
-            });
+            }, cancellationToken);
         }
 
-        public async Task<Transaction> GetById(Guid id)
+        public async Task<Transaction> GetById(Guid id, CancellationToken cancellationToken)
         {
             var dbModel = await _context.Transactions
                 .AsNoTracking()
-                .FirstOrDefaultAsync(transaction => transaction.Id == id);
+                .FirstOrDefaultAsync(transaction => transaction.Id == id, cancellationToken);
 
             if (dbModel == null)
             {
@@ -48,11 +48,11 @@ namespace MiniBank.Data.Transactions.Repositories
             };
         }
 
-        public async Task Update(Transaction transaction)
+        public async Task Update(Transaction transaction, CancellationToken cancellationToken)
         {
             var dbModel =
                 await _context.Transactions.FirstOrDefaultAsync(currentTransaction =>
-                    currentTransaction.Id == transaction.Id);
+                    currentTransaction.Id == transaction.Id, cancellationToken);
 
             if (dbModel == null)
             {
@@ -65,9 +65,10 @@ namespace MiniBank.Data.Transactions.Repositories
             dbModel.ReplenishmentAccount = transaction.ReplenishmentAccount;
         }
 
-        public async Task DeleteById(Guid id)
+        public async Task DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            var dbModel = await _context.Transactions.FirstOrDefaultAsync(transaction => transaction.Id == id);
+            var dbModel =
+                await _context.Transactions.FirstOrDefaultAsync(transaction => transaction.Id == id, cancellationToken);
 
             if (dbModel == null)
             {

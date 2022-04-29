@@ -67,7 +67,7 @@ namespace MiniBank.Web.Controllers.BankAccounts
         [HttpPut("{id:guid}")]
         public Task Update(Guid id, BankAccountMoneyUpdateRequest model, CancellationToken cancellationToken)
         {
-            return _bankAccountService.UpdateMoneyOnAccount(id, model.AmountOfMoney, cancellationToken);
+            return _bankAccountService.UpdateAccountMoney(id, model.AmountOfMoney, cancellationToken);
         }
 
         [HttpPost]
