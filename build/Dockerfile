@@ -15,7 +15,7 @@ WORKDIR /app
 
 COPY --from=src /dist .
 
-EXPOSE 5001
-ENV ASPNETCORE_URLS=http://0.0.0.0:5001
+EXPOSE 5000 5001
+ENV ASPNETCORE_URLS=http://0.0.0.0:5000;http://0.0.0.0:5001
 
 ENTRYPOINT ["dotnet", "MiniBank.Web.dll"]
