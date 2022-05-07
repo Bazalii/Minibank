@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using MiniBank.Core.Exceptions;
 using MiniBank.Data.Exceptions;
+using MiniBank.Web.Exceptions;
 
 namespace MiniBank.Web.Middlewares
 {
@@ -25,7 +26,7 @@ namespace MiniBank.Web.Middlewares
             catch (ValidationException validationException)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{validationException.Message }"});
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{validationException.Message}" });
             }
             catch (FluentValidation.ValidationException exception)
             {
@@ -34,12 +35,17 @@ namespace MiniBank.Web.Middlewares
 
                 var errorMessage = string.Join(Environment.NewLine, errors);
 
-                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{errorMessage }"});
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{errorMessage}" });
             }
             catch (ObjectNotFoundException objectNotFoundException)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{objectNotFoundException.Message }"});
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{objectNotFoundException.Message}" });
+            }
+            catch (NotAuthorizedException notAuthorizedException)
+            {
+                httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await httpContext.Response.WriteAsJsonAsync(new { Error = $"{notAuthorizedException.Message}" });
             }
             catch (Exception)
             {

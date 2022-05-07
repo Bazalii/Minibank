@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using MiniBank.Web.Exceptions;
 
 namespace MiniBank.Web.Middlewares;
 
@@ -19,6 +20,11 @@ public class CustomAuthenticationMiddleware
         {
             var token = httpContext.Request.Headers.Authorization.ToString();
 
+            if (token.Length == 0)
+            {
+                throw new NotAuthorizedException("You are not authorized!");
+            }
+
             var indexOfFirstDot = token.IndexOf('.');
             var indexOfSecondDot = token[(indexOfFirstDot + 1)..token.Length].IndexOf('.');
 
@@ -32,8 +38,6 @@ public class CustomAuthenticationMiddleware
 
             var expirationDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             expirationDate = expirationDate.AddSeconds(expirationDateInUnixTime);
-            Console.WriteLine(expirationDate);
-            Console.WriteLine(DateTime.UtcNow);
 
             if (expirationDate < DateTime.UtcNow)
             {
