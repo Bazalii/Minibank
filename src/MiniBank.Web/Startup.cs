@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
@@ -70,7 +69,6 @@ namespace MiniBank.Web
                     options.Authority = Configuration["AuthorityUri"];
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateLifetime = true,
                         ValidateAudience = false
                     };
                 });
@@ -94,6 +92,8 @@ namespace MiniBank.Web
 
             app.UseRouting();
 
+            app.UseMiddleware<CustomAuthenticationMiddleware>();
+            
             app.UseAuthentication();
 
             app.UseAuthorization();
